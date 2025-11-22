@@ -81,5 +81,66 @@ describe('DeviceSelection', () => {
       expect(card).toHaveAttribute('aria-pressed', 'false');
     });
   });
+
+  it('should hide current device from the list when currentDevice is provided', () => {
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext} 
+        currentDevice="dexcom-g7"
+      />
+    );
+    
+    // Current device should not be in the list
+    expect(screen.queryByTestId('device-card-dexcom-g7')).not.toBeInTheDocument();
+    
+    // Other devices should still be visible
+    expect(screen.getByTestId('device-card-dexcom-g6')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-libre-freestyle-3')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-libre-14-day')).toBeInTheDocument();
+  });
+
+  it('should show all devices when currentDevice is null', () => {
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext} 
+        currentDevice={null}
+      />
+    );
+    
+    DEVICES.forEach((device) => {
+      expect(screen.getByTestId(`device-card-${device.id}`)).toBeInTheDocument();
+    });
+  });
+
+  it('should show all devices when currentDevice is not provided', () => {
+    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+    
+    DEVICES.forEach((device) => {
+      expect(screen.getByTestId(`device-card-${device.id}`)).toBeInTheDocument();
+    });
+  });
+
+  it('should filter out current device but still show 3 remaining devices', () => {
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext} 
+        currentDevice="libre-freestyle-3"
+      />
+    );
+    
+    // Should have 3 devices (4 total - 1 current)
+    const deviceCards = screen.getAllByRole('button', { pressed: false });
+    expect(deviceCards).toHaveLength(3);
+    
+    // Specific checks
+    expect(screen.queryByTestId('device-card-libre-freestyle-3')).not.toBeInTheDocument();
+    expect(screen.getByTestId('device-card-dexcom-g7')).toBeInTheDocument();
+  });
 });
 

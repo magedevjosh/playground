@@ -189,6 +189,7 @@ export default function FlowContainer() {
             {...stepProps}
             value={flowState.answers.deviceSelection}
             onChange={(value) => updateAnswer('deviceSelection', value)}
+            currentDevice={flowState.answers.currentDevice}
           />
         );
 
