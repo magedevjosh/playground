@@ -2,7 +2,6 @@ interface NavigationButtonsProps {
   onBack: () => void;
   onNext: () => void;
   canGoBack: boolean;
-  canGoNext: boolean;
   isLastStep?: boolean;
 }
 
@@ -10,7 +9,6 @@ export default function NavigationButtons({
   onBack,
   onNext,
   canGoBack,
-  canGoNext,
   isLastStep = false,
 }: NavigationButtonsProps) {
   return (
@@ -29,13 +27,8 @@ export default function NavigationButtons({
       )}
       <button
         onClick={onNext}
-        disabled={!canGoNext}
-        className={`px-6 py-3 rounded-lg font-medium transition-all ${
-          canGoNext
-            ? 'text-gray-800 hover:opacity-90 cursor-pointer'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        }`}
-        style={canGoNext ? { backgroundColor: '#d2bed8' } : undefined}
+        className="px-6 py-3 rounded-lg font-medium transition-all text-gray-800 hover:opacity-90 cursor-pointer"
+        style={{ backgroundColor: '#d2bed8' }}
         aria-label={isLastStep ? 'Complete' : 'Go to next step'}
         data-testid={isLastStep ? 'complete-button' : 'next-button'}
       >

@@ -5,9 +5,9 @@ import { StepId, FlowState, FlowAnswers } from '@/types/cgm-flow';
 import {
   getNextStep,
   getPreviousStep,
-  canProceed,
   getStepTitle,
   getStepQuestion,
+  getValidationError,
 } from '@/utils/navigation-logic';
 import Header from './ui/Header';
 import NavigationButtons from './ui/NavigationButtons';
@@ -38,6 +38,7 @@ export default function FlowContainer() {
     answers: initialAnswers,
     stepHistory: ['currently-using-cgm'],
   });
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -69,9 +70,21 @@ export default function FlowContainer() {
         [field]: value,
       },
     }));
+    // Clear validation error when user makes a selection
+    setValidationError(null);
   };
 
   const handleNext = () => {
+    // Validate before proceeding
+    const error = getValidationError(flowState.currentStep, flowState.answers);
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+
+    // Clear any validation error
+    setValidationError(null);
+
     const nextStep = getNextStep(flowState.currentStep, flowState.answers);
     if (nextStep) {
       setFlowState((prev) => ({
@@ -103,6 +116,7 @@ export default function FlowContainer() {
       answers: initialAnswers,
       stepHistory: ['currently-using-cgm'],
     });
+    setValidationError(null);
   };
 
   const handleLogoClick = () => {
@@ -112,9 +126,9 @@ export default function FlowContainer() {
       answers: initialAnswers,
       stepHistory: ['currently-using-cgm'],
     });
+    setValidationError(null);
   };
 
-  const canGoNext = canProceed(flowState.currentStep, flowState.answers);
   const canGoBack = flowState.stepHistory.length > 1;
   const isLastStep = flowState.currentStep === 'summary';
 
@@ -227,12 +241,27 @@ export default function FlowContainer() {
           {/* Step content */}
           <div className="mb-6">{renderStep()}</div>
 
+          {/* Validation error */}
+          {validationError && (
+            <div
+              className="mb-4 p-4 rounded-lg"
+              style={{
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fca5a5',
+                color: '#991b1b',
+              }}
+              role="alert"
+              data-testid="validation-error"
+            >
+              {validationError}
+            </div>
+          )}
+
           {/* Navigation */}
           <NavigationButtons
             onBack={handleBack}
             onNext={handleNext}
             canGoBack={canGoBack}
-            canGoNext={canGoNext}
             isLastStep={isLastStep}
           />
         </main>

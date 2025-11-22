@@ -5,6 +5,7 @@ import {
   canProceed,
   getStepTitle,
   getStepQuestion,
+  getValidationError,
 } from '../navigation-logic';
 import { FlowAnswers, StepId } from '@/types/cgm-flow';
 
@@ -285,6 +286,118 @@ describe('navigation-logic', () => {
 
     it('should return empty string for unknown step', () => {
       expect(getStepQuestion('unknown-step' as StepId)).toBe('');
+    });
+  });
+
+  describe('getValidationError', () => {
+    const emptyAnswers: FlowAnswers = {
+      currentlyUsingCGM: null,
+      currentDevice: null,
+      lastDeviceUpdate: null,
+      lastSensorsOrdered: null,
+      deviceSwitchIntention: null,
+      deviceSelection: null,
+      lastDoctorVisit: null,
+    };
+
+    it('should return error for currently-using-cgm when answer is null', () => {
+      expect(getValidationError('currently-using-cgm', emptyAnswers)).toBe(
+        'Please select whether you are currently using a CGM device.'
+      );
+    });
+
+    it('should return null for currently-using-cgm when answer is true', () => {
+      const answers = { ...emptyAnswers, currentlyUsingCGM: true };
+      expect(getValidationError('currently-using-cgm', answers)).toBeNull();
+    });
+
+    it('should return null for currently-using-cgm when answer is false', () => {
+      const answers = { ...emptyAnswers, currentlyUsingCGM: false };
+      expect(getValidationError('currently-using-cgm', answers)).toBeNull();
+    });
+
+    it('should return error for current-device when answer is null', () => {
+      expect(getValidationError('current-device', emptyAnswers)).toBe(
+        'Please select your current CGM device.'
+      );
+    });
+
+    it('should return null for current-device when answer is provided', () => {
+      const answers = { ...emptyAnswers, currentDevice: 'dexcom-g7' };
+      expect(getValidationError('current-device', answers)).toBeNull();
+    });
+
+    it('should return error for last-device-update when answer is null', () => {
+      expect(getValidationError('last-device-update', emptyAnswers)).toBe(
+        'Please select when your last device update was.'
+      );
+    });
+
+    it('should return null for last-device-update when answer is provided', () => {
+      const answers = { ...emptyAnswers, lastDeviceUpdate: '0-1-year' };
+      expect(getValidationError('last-device-update', answers)).toBeNull();
+    });
+
+    it('should return error for last-sensors-ordered when answer is null', () => {
+      expect(getValidationError('last-sensors-ordered', emptyAnswers)).toBe(
+        'Please select when you last ordered sensors.'
+      );
+    });
+
+    it('should return null for last-sensors-ordered when answer is provided', () => {
+      const answers = { ...emptyAnswers, lastSensorsOrdered: '0-1-months' };
+      expect(getValidationError('last-sensors-ordered', answers)).toBeNull();
+    });
+
+    it('should return error for device-switch-intention when answer is null', () => {
+      expect(getValidationError('device-switch-intention', emptyAnswers)).toBe(
+        'Please indicate whether you are interested in switching devices.'
+      );
+    });
+
+    it('should return null for device-switch-intention when answer is true', () => {
+      const answers = { ...emptyAnswers, deviceSwitchIntention: true };
+      expect(getValidationError('device-switch-intention', answers)).toBeNull();
+    });
+
+    it('should return null for device-switch-intention when answer is false', () => {
+      const answers = { ...emptyAnswers, deviceSwitchIntention: false };
+      expect(getValidationError('device-switch-intention', answers)).toBeNull();
+    });
+
+    it('should return error for device-selection when answer is null', () => {
+      expect(getValidationError('device-selection', emptyAnswers)).toBe(
+        'Please select a CGM device.'
+      );
+    });
+
+    it('should return null for device-selection when answer is provided', () => {
+      const answers = { ...emptyAnswers, deviceSelection: 'libre-freestyle-3' };
+      expect(getValidationError('device-selection', answers)).toBeNull();
+    });
+
+    it('should return error for last-doctor-visit when answer is null', () => {
+      expect(getValidationError('last-doctor-visit', emptyAnswers)).toBe(
+        'Please indicate whether you have seen your primary care physician in the last 6 months.'
+      );
+    });
+
+    it('should return null for last-doctor-visit when answer is true', () => {
+      const answers = { ...emptyAnswers, lastDoctorVisit: true };
+      expect(getValidationError('last-doctor-visit', answers)).toBeNull();
+    });
+
+    it('should return null for last-doctor-visit when answer is false', () => {
+      const answers = { ...emptyAnswers, lastDoctorVisit: false };
+      expect(getValidationError('last-doctor-visit', answers)).toBeNull();
+    });
+
+    it('should return null for summary step', () => {
+      expect(getValidationError('summary', emptyAnswers)).toBeNull();
+    });
+
+    it('should return null for unknown step', () => {
+      expect(getValidationError('unknown-step' as StepId, emptyAnswers)).toBeNull();
     });
   });
 });

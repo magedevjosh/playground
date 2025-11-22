@@ -25,10 +25,45 @@ describe('FlowContainer', () => {
       expect(screen.getByTestId('start-over-button')).toBeInTheDocument();
     });
 
-    it('should disable Next button when no answer is selected', () => {
+    it('should show validation error when Next button is clicked without selection', async () => {
+      const user = userEvent.setup();
       render(<FlowContainer />);
+      
       const nextButton = screen.getByTestId('next-button');
-      expect(nextButton).toBeDisabled();
+      expect(nextButton).toBeEnabled();
+      
+      // Click Next without making a selection
+      await user.click(nextButton);
+      
+      // Should show validation error
+      await waitFor(() => {
+        const errorMessage = screen.getByTestId('validation-error');
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage).toHaveTextContent('Please select whether you are currently using a CGM device.');
+      });
+    });
+
+    it('should clear validation error when selection is made', async () => {
+      const user = userEvent.setup();
+      render(<FlowContainer />);
+      
+      const nextButton = screen.getByTestId('next-button');
+      
+      // Click Next without making a selection to trigger error
+      await user.click(nextButton);
+      
+      // Should show validation error
+      await waitFor(() => {
+        expect(screen.getByTestId('validation-error')).toBeInTheDocument();
+      });
+      
+      // Make a selection
+      await user.click(screen.getByLabelText('Yes'));
+      
+      // Error should be cleared
+      await waitFor(() => {
+        expect(screen.queryByTestId('validation-error')).not.toBeInTheDocument();
+      });
     });
 
     it('should not show Back button on first step', () => {

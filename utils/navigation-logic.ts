@@ -124,3 +124,48 @@ export function getStepQuestion(step: StepId): string {
   }
 }
 
+export function getValidationError(currentStep: StepId, answers: FlowAnswers): string | null {
+  switch (currentStep) {
+    case 'currently-using-cgm':
+      return answers.currentlyUsingCGM === null
+        ? 'Please select whether you are currently using a CGM device.'
+        : null;
+
+    case 'current-device':
+      return answers.currentDevice === null
+        ? 'Please select your current CGM device.'
+        : null;
+
+    case 'last-device-update':
+      return answers.lastDeviceUpdate === null
+        ? 'Please select when your last device update was.'
+        : null;
+
+    case 'last-sensors-ordered':
+      return answers.lastSensorsOrdered === null
+        ? 'Please select when you last ordered sensors.'
+        : null;
+
+    case 'device-switch-intention':
+      return answers.deviceSwitchIntention === null
+        ? 'Please indicate whether you are interested in switching devices.'
+        : null;
+
+    case 'device-selection':
+      return answers.deviceSelection === null
+        ? 'Please select a CGM device.'
+        : null;
+
+    case 'last-doctor-visit':
+      return answers.lastDoctorVisit === null
+        ? 'Please indicate whether you have seen your primary care physician in the last 6 months.'
+        : null;
+
+    case 'summary':
+      return null; // No validation needed on summary
+
+    default:
+      return null;
+  }
+}
+

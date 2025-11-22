@@ -19,7 +19,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
         />
       );
       
@@ -33,7 +32,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={false}
-          canGoNext={true}
         />
       );
       
@@ -47,7 +45,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
         />
       );
       
@@ -63,7 +60,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
         />
       );
       
@@ -79,7 +75,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={false}
-          canGoNext={true}
         />
       );
       
@@ -87,32 +82,17 @@ describe('NavigationButtons', () => {
       expect(screen.getByText('Next')).toBeInTheDocument();
     });
 
-    it('should enable Next button when canGoNext is true', () => {
+    it('should always enable Next button', () => {
       render(
         <NavigationButtons
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={false}
-          canGoNext={true}
         />
       );
       
       const nextButton = screen.getByTestId('next-button');
       expect(nextButton).toBeEnabled();
-    });
-
-    it('should disable Next button when canGoNext is false', () => {
-      render(
-        <NavigationButtons
-          onBack={mockOnBack}
-          onNext={mockOnNext}
-          canGoBack={false}
-          canGoNext={false}
-        />
-      );
-      
-      const nextButton = screen.getByTestId('next-button');
-      expect(nextButton).toBeDisabled();
     });
 
     it('should call onNext when Next button is clicked', async () => {
@@ -122,7 +102,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={false}
-          canGoNext={true}
         />
       );
       
@@ -138,29 +117,11 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={false}
-          canGoNext={true}
         />
       );
       
       const nextButton = screen.getByTestId('next-button');
       expect(nextButton).toHaveAttribute('aria-label', 'Go to next step');
-    });
-
-    it('should not call onNext when disabled button is clicked', async () => {
-      const user = userEvent.setup();
-      render(
-        <NavigationButtons
-          onBack={mockOnBack}
-          onNext={mockOnNext}
-          canGoBack={false}
-          canGoNext={false}
-        />
-      );
-      
-      const nextButton = screen.getByTestId('next-button');
-      await user.click(nextButton);
-      
-      expect(mockOnNext).not.toHaveBeenCalled();
     });
   });
 
@@ -171,7 +132,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
           isLastStep={true}
         />
       );
@@ -186,7 +146,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
           isLastStep={true}
         />
       );
@@ -202,7 +161,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
           isLastStep={true}
         />
       );
@@ -213,13 +171,12 @@ describe('NavigationButtons', () => {
       expect(mockOnNext).toHaveBeenCalledTimes(1);
     });
 
-    it('should be enabled on last step when canGoNext is true', () => {
+    it('should always be enabled on last step', () => {
       render(
         <NavigationButtons
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
           isLastStep={true}
         />
       );
@@ -230,13 +187,12 @@ describe('NavigationButtons', () => {
   });
 
   describe('Button Layout', () => {
-    it('should render both buttons when both are enabled', () => {
+    it('should render both buttons when back is enabled', () => {
       render(
         <NavigationButtons
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
         />
       );
       
@@ -250,7 +206,6 @@ describe('NavigationButtons', () => {
           onBack={mockOnBack}
           onNext={mockOnNext}
           canGoBack={true}
-          canGoNext={true}
         />
       );
       
