@@ -18,7 +18,7 @@ export default function RadioOption({
   return (
     <label
       htmlFor={id}
-      className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+      className={`flex items-center p-4 border-2 cursor-pointer transition-all ${
         checked
           ? 'bg-primary-light'
           : 'border-gray-300 hover:border-gray-400 bg-white'

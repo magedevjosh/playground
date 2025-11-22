@@ -10,7 +10,7 @@ export default function DeviceCard({ device, selected, onSelect }: DeviceCardPro
   return (
     <button
       onClick={() => onSelect(device.id)}
-      className={`w-full flex items-start gap-4 p-4 border-2 rounded-lg transition-all text-left ${
+      className={`w-full flex items-start gap-4 p-4 border-2 transition-all text-left ${
         selected
           ? 'bg-primary-light'
           : 'border-gray-300 hover:border-gray-400 bg-white'

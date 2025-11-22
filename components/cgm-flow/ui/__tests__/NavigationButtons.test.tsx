@@ -212,8 +212,8 @@ describe('NavigationButtons', () => {
       const backButton = screen.getByTestId('back-button');
       const nextButton = screen.getByTestId('next-button');
       
-      expect(backButton).toHaveClass('px-6', 'py-3', 'rounded-lg');
-      expect(nextButton).toHaveClass('px-6', 'py-3', 'rounded-lg');
+      expect(backButton).toHaveClass('px-6', 'py-3');
+      expect(nextButton).toHaveClass('px-6', 'py-3');
     });
   });
 });

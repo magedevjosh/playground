@@ -24,7 +24,7 @@ export default function Summary({ answers }: SummaryProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-primary-light rounded-lg p-6" style={{ borderWidth: '1px', borderColor: '#d2bed8' }}>
+      <div className="bg-primary-light p-6" style={{ borderWidth: '1px', borderColor: '#d2bed8' }}>
         <h3 className="text-lg font-semibold mb-4" style={{ color: '#9d7ea7' }}>
           Your CGM Experience Profile
         </h3>

@@ -215,7 +215,7 @@ export default function FlowContainer() {
       <div className="max-w-3xl w-full mx-auto px-6 py-8">
         <Header onLogoClick={handleLogoClick} />
         
-        <main className="bg-white rounded-lg shadow-lg p-8">
+        <main className="bg-white shadow-lg p-8">
           {/* Progress indicator */}
           <div className="mb-8">
             <div className="flex justify-between items-center text-sm mb-2">
@@ -245,7 +245,7 @@ export default function FlowContainer() {
           {/* Validation error */}
           {validationError && (
             <div
-              className="mb-4 p-4 rounded-lg"
+              className="mb-4 p-4"
               style={{
                 backgroundColor: '#fef2f2',
                 border: '1px solid #fca5a5',
