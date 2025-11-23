@@ -224,7 +224,7 @@ export default function FlowContainer() {
               </div>
               <button
                 onClick={handleStartOver}
-                className="text-gray-600 hover:text-gray-900 underline transition-colors"
+                className="text-gray-600 hover:text-gray-900 underline transition-colors cursor-pointer"
                 aria-label="Start over from the beginning"
                 data-testid="start-over-button"
               >
