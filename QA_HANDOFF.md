@@ -27,10 +27,10 @@
 This document provides comprehensive testing scenarios for the CGM (Continuous Glucose Monitor) Device Selection Flow. The feature guides patients through a multi-step questionnaire to select appropriate CGM devices based on their current usage status and preferences.
 
 ### Scope of Testing
-- **User Flows:** 3 primary paths (2 conditional branches)
-- **Total Steps:** 4-8 steps depending on user responses
-- **Supported Devices:** 4 CGM devices (Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day)
-- **Key Features:** Conditional navigation, state persistence, back navigation, flow restart capability
+- **User Flows:** 4 primary paths (3 conditional branches, including eligibility check)
+- **Total Steps:** 4-8 steps depending on user responses (or termination at ineligibility step)
+- **Supported Devices:** 5 CGM devices (Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day, and "I don't see my device")
+- **Key Features:** Conditional navigation, eligibility verification, state persistence, back navigation, flow restart capability
 
 ### Target Browsers
 - Chrome (latest 2 versions)
@@ -139,7 +139,7 @@ The CGM Device Selection Flow streamlines the process of helping patients identi
 - [ ] Message displayed: "Thank you for completing the CGM device selection experience"
 
 #### FR-10: Device Selection
-- [ ] All 4 devices are displayed with correct information
+- [ ] All 5 devices are displayed with correct information
 - [ ] Each device shows: name, description, icon placeholder
 - [ ] Clicking a device card selects it (visual feedback with styling change)
 - [ ] Only one device can be selected at a time
@@ -186,14 +186,18 @@ START: Currently Using CGM?
     |
     |-- [NO] --> Device Selection --> Last Doctor Visit --> SUMMARY (4 steps)
     |
-    |-- [YES] --> Current Device --> Last Device Update --> Last Sensors Ordered
-                                                                |
-                                                                v
-                                                    Device Switch Intention?
-                                                                |
-                                                                |-- [YES] --> Device Selection --> Last Doctor Visit --> SUMMARY (8 steps)
-                                                                |
-                                                                |-- [NO] --> Last Doctor Visit --> SUMMARY (7 steps)
+    |-- [YES] --> Current Device --> Last Device Update
+                                            |
+                                            |-- [Device = "other" AND Update ≠ "5+ Years"] --> INELIGIBLE (Terminal)
+                                            |
+                                            |-- [Device ≠ "other" OR Update = "5+ Years"] --> Last Sensors Ordered
+                                                                                                    |
+                                                                                                    v
+                                                                                        Device Switch Intention?
+                                                                                                    |
+                                                                                                    |-- [YES] --> Device Selection --> Last Doctor Visit --> SUMMARY (8 steps)
+                                                                                                    |
+                                                                                                    |-- [NO] --> Last Doctor Visit --> SUMMARY (7 steps)
 ```
 
 ### Path 1: New CGM User (Shortest Path)
@@ -238,7 +242,32 @@ START: Currently Using CGM?
 
 ---
 
-### Path 3: Existing User - Wants to Switch Devices
+### Path 3: Ineligible User - Device Not Listed with Recent Update
+**Total Steps: 4 (Terminal)**
+
+| Step # | Step Name | Question | Options | Next Step |
+|--------|-----------|----------|---------|-----------|
+| 1 | Currently Using CGM | Are you currently using a CGM device? | Yes / No | **Select: Yes** → Step 2 |
+| 2 | Current Device | Which CGM device are you currently using? | Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day, I don't see my device | **Select: I don't see my device** → Step 3 |
+| 3 | Last Device Update | When was your last device update? | 0-1 Year, 1-3 Years, 3-4 Years, 5+ Years | **Select: Any except 5+ Years** → Step 4 |
+| 4 | Ineligible Selection | Eligibility Status | (Display only - ineligible message) | Terminal - Back or Start Over |
+
+**Expected Behavior:**
+- Step 4 displays ineligibility message
+- No Next or Complete button shown
+- Only Back button available
+- Customer support phone number (1-800-555-0123) is clickable
+- Message explains: device not specified AND less than 5 years since last update
+- User must go back to change answers or use Start Over
+
+**Note:** If user goes back and changes either:
+- Current Device to a specific device (not "I don't see my device"), OR
+- Last Device Update to "5+ Years"
+Then they become eligible and continue with normal flow.
+
+---
+
+### Path 4: Existing User - Wants to Switch Devices
 **Total Steps: 8**
 
 | Step # | Step Name | Question | Options | Next Step |
@@ -652,13 +681,13 @@ Each test case includes:
 
 #### TC-011: All Device Selections - New User Path
 **Priority:** Medium  
-**Objective:** Verify all 4 devices work correctly in the new user path
+**Objective:** Verify all 5 devices work correctly in the new user path
 
 **Preconditions:**
 - Application is loaded
 
 **Steps:**
-For each device (Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day):
+For each device (Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day, I don't see my device):
 1. Start/restart the flow
 2. Select "No" for "Currently Using CGM"
 3. Click "Next"
@@ -670,7 +699,7 @@ For each device (Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day):
 9. Click "Start Over"
 
 **Expected Results:**
-- All 4 devices can be selected
+- All 5 devices can be selected
 - Each device displays correct name and description
 - Summary shows correct device name for each
 - No errors occur with any device
@@ -878,6 +907,88 @@ For each time range (0-1 months, 1-3 months, 3-6 months, 6+ months):
 - No quota errors occur during normal use
 - Application handles storage errors gracefully if they occur
 - No data corruption
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-027: Ineligible User Flow - Device "Other" with Recent Update
+**Priority:** Critical  
+**Objective:** Verify ineligibility detection when user selects "I don't see my device" and update < 5 years
+
+**Preconditions:**
+- Application is loaded
+- No localStorage data exists
+
+**Steps:**
+1. Navigate to the application URL
+2. On "Currently Using CGM", click "Yes"
+3. Click "Next"
+4. On "Current Device", select "I don't see my device"
+5. Click "Next"
+6. On "Last Device Update", select "0-1 Year"
+7. Click "Next"
+8. Verify you're on "Ineligible for Equipment" step
+9. Verify ineligibility message is displayed
+10. Verify message mentions: not selecting specific device AND less than 5 years
+11. Verify phone number "1-800-555-0123" is displayed
+12. Click phone number link
+13. Verify it opens phone dialer with correct number
+14. Verify only "Back" button is shown (no Next or Complete button)
+15. Repeat test with "1-3 Years" and "3-4 Years" selections
+
+**Expected Results:**
+- User is routed to ineligibility step
+- Clear message explains why they're ineligible
+- Phone number is clickable (tel: link)
+- Only Back button available
+- Flow terminates at this step (cannot proceed)
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-028: Eligibility Edge Cases
+**Priority:** High  
+**Objective:** Verify correct eligibility routing for edge cases
+
+**Preconditions:**
+- Application is loaded
+- No localStorage data exists
+
+**Steps:**
+
+**Test Case A: "Other" device with 5+ years (ELIGIBLE)**
+1. Navigate to application
+2. Select "Yes" for Currently Using CGM
+3. Select "I don't see my device" for Current Device
+4. Select "5+ Years" for Last Device Update
+5. Click "Next"
+6. Verify you proceed to "Last Sensors Ordered" (NOT ineligible)
+
+**Test Case B: Specific device with recent update (ELIGIBLE)**
+7. Click "Start Over"
+8. Select "Yes" for Currently Using CGM
+9. Select "Dexcom G7" for Current Device
+10. Select "0-1 Year" for Last Device Update
+11. Click "Next"
+12. Verify you proceed to "Last Sensors Ordered" (NOT ineligible)
+
+**Test Case C: User corrects from ineligible state**
+13. Click "Start Over"
+14. Navigate to ineligible state (other device + 0-1 year)
+15. Click "Back" from ineligible step
+16. Change "Last Device Update" to "5+ Years"
+17. Click "Next"
+18. Verify you proceed to "Last Sensors Ordered"
+19. Complete flow successfully
+
+**Expected Results:**
+- Only users with "other" device AND < 5 years update are ineligible
+- All other combinations allow flow to continue
+- Users can correct their answers and continue
 
 **Actual Results:** [To be filled]  
 **Pass/Fail:** [To be marked]
@@ -1120,6 +1231,7 @@ For each time range (0-1 months, 1-3 months, 3-6 months, 6+ months):
 | `dexcom-g6` | Dexcom G6 | Proven CGM technology with no fingersticks required and seamless smartphone integration. | 📲 |
 | `libre-freestyle-3` | Libre FreeStyle 3 | Small, discreet sensor with continuous glucose monitoring and smartphone alerts. | ⌚ |
 | `libre-14-day` | Libre 14 Day | Affordable CGM option with 14-day wear time and easy scanning technology. | 🔍 |
+| `other` | I don't see my device | Select this option if your device is not listed above. | ❓ |
 
 ### Time Range Options
 
@@ -1158,6 +1270,7 @@ All Yes/No questions:
 | `device-switch-intention` | Device Switch Intention | Are you interested in switching to a different CGM device? |
 | `device-selection` | Device Selection | Which CGM device would you like to select? |
 | `last-doctor-visit` | Last Doctor Visit | Have you seen your primary care physician in the last 6 months? |
+| `ineligible-selection` | Ineligible for Equipment | Eligibility Status |
 | `summary` | Summary | Review Your Selections |
 
 ### Test ID Attributes
@@ -1278,7 +1391,7 @@ When reporting bugs found during QA, please include:
 **Test Environment:** [Development/Staging/Production]
 
 **Test Summary:**
-- Total Test Cases: 26
+- Total Test Cases: 28
 - Passed: [To be filled]
 - Failed: [To be filled]
 - Blocked: [To be filled]
@@ -1311,6 +1424,9 @@ Currently Using CGM (Yes) → Current Device → Last Device Update → Last Sen
 
 **Existing User - Switch (8 steps):**
 Currently Using CGM (Yes) → Current Device → Last Device Update → Last Sensors Ordered → Device Switch Intention (Yes) → Device Selection → Last Doctor Visit → Summary
+
+**Ineligible User (Terminal):**
+Currently Using CGM (Yes) → Current Device ("I don't see my device") → Last Device Update (< 5 years) → Ineligible Selection (Must go back or start over)
 
 ---
 

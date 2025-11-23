@@ -414,6 +414,123 @@ describe('FlowContainer', () => {
         expect(screen.getByText('Summary')).toBeInTheDocument();
       });
     });
+
+    it('should handle ineligible user flow - device "other" with recent update', async () => {
+      const user = userEvent.setup();
+      render(<FlowContainer />);
+
+      // Step 1: Currently using CGM - Yes
+      await user.click(screen.getByLabelText('Yes'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 2: Current Device - Select "I don't see my device"
+      await waitFor(() => {
+        expect(screen.getByText('Current Device')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('device-card-other'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 3: Last Device Update - Select "0-1 Year" (not eligible)
+      await waitFor(() => {
+        expect(screen.getByText('Last Device Update')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('radio-option-0-1-year'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 4: Should show Ineligible Selection
+      await waitFor(() => {
+        expect(screen.getByText('Ineligible for Equipment')).toBeInTheDocument();
+        expect(screen.getByText(/unable to provide you with equipment/i)).toBeInTheDocument();
+      });
+
+      // Should show phone link
+      const phoneLink = screen.getByRole('link', { name: /1-800-555-0123/i });
+      expect(phoneLink).toBeInTheDocument();
+      expect(phoneLink).toHaveAttribute('href', 'tel:18005550123');
+
+      // Should have Back button but not Next button
+      expect(screen.getByTestId('back-button')).toBeInTheDocument();
+      expect(screen.queryByTestId('next-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('complete-button')).not.toBeInTheDocument();
+    });
+
+    it('should allow user to go back and correct answers from ineligible step', async () => {
+      const user = userEvent.setup();
+      render(<FlowContainer />);
+
+      // Navigate to ineligible state
+      await user.click(screen.getByLabelText('Yes'));
+      await user.click(screen.getByTestId('next-button'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Current Device')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('device-card-other'));
+      await user.click(screen.getByTestId('next-button'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Last Device Update')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('radio-option-1-3-years'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Verify at ineligible step
+      await waitFor(() => {
+        expect(screen.getByText('Ineligible for Equipment')).toBeInTheDocument();
+      });
+
+      // Go back and change answer
+      await user.click(screen.getByTestId('back-button'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Last Device Update')).toBeInTheDocument();
+      });
+
+      // Change to 5+ years (eligible)
+      await user.click(screen.getByTestId('radio-option-5-plus-years'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Should now go to Last Sensors Ordered (normal flow)
+      await waitFor(() => {
+        expect(screen.getByText('Last Sensors Ordered')).toBeInTheDocument();
+      });
+    });
+
+    it('should allow eligible flow when device is "other" but update is 5+ years', async () => {
+      const user = userEvent.setup();
+      render(<FlowContainer />);
+
+      // Step 1: Currently using CGM - Yes
+      await user.click(screen.getByLabelText('Yes'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 2: Current Device - Select "I don't see my device"
+      await waitFor(() => {
+        expect(screen.getByText('Current Device')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('device-card-other'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 3: Last Device Update - Select "5+ Years" (eligible)
+      await waitFor(() => {
+        expect(screen.getByText('Last Device Update')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('radio-option-5-plus-years'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 4: Should go to Last Sensors Ordered (not ineligible)
+      await waitFor(() => {
+        expect(screen.getByText('Last Sensors Ordered')).toBeInTheDocument();
+      });
+
+      // Verify we can continue the normal flow
+      await user.click(screen.getByTestId('radio-option-0-1-months'));
+      await user.click(screen.getByTestId('next-button'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Device Switch Intention')).toBeInTheDocument();
+      });
+    });
   });
 });
 

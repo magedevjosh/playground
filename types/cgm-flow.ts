@@ -6,6 +6,7 @@ export type StepId =
   | 'device-switch-intention'
   | 'device-selection'
   | 'last-doctor-visit'
+  | 'ineligible-selection'
   | 'summary';
 
 export interface FlowAnswers {
@@ -61,6 +62,12 @@ export const DEVICES: Device[] = [
     name: 'Libre 14 Day',
     description: 'Affordable CGM option with 14-day wear time and easy scanning technology.',
     imagePlaceholder: '🔍',
+  },
+  {
+    id: 'other',
+    name: 'I don\'t see my device',
+    description: 'Select this option if your device is not listed above.',
+    imagePlaceholder: '❓',
   },
 ];
 

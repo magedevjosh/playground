@@ -18,6 +18,7 @@ import LastSensorsOrdered from './steps/LastSensorsOrdered';
 import DeviceSwitchIntention from './steps/DeviceSwitchIntention';
 import DeviceSelection from './steps/DeviceSelection';
 import LastDoctorVisit from './steps/LastDoctorVisit';
+import IneligibleSelection from './steps/IneligibleSelection';
 import Summary from './steps/Summary';
 
 const STORAGE_KEY = 'cgm-flow-state';
@@ -131,6 +132,7 @@ export default function FlowContainer() {
 
   const canGoBack = flowState.stepHistory.length > 1;
   const isLastStep = flowState.currentStep === 'summary';
+  const isIneligibleStep = flowState.currentStep === 'ineligible-selection';
 
   const renderStep = () => {
     const stepProps = {
@@ -202,6 +204,15 @@ export default function FlowContainer() {
           />
         );
 
+      case 'ineligible-selection':
+        return (
+          <IneligibleSelection
+            {...stepProps}
+            value={null}
+            onChange={() => {}}
+          />
+        );
+
       case 'summary':
         return <Summary answers={flowState.answers} />;
 
@@ -259,12 +270,27 @@ export default function FlowContainer() {
           )}
 
           {/* Navigation */}
-          <NavigationButtons
-            onBack={handleBack}
-            onNext={handleNext}
-            canGoBack={canGoBack}
-            isLastStep={isLastStep}
-          />
+          {isIneligibleStep ? (
+            <div className="flex justify-between items-center w-full mt-8">
+              {canGoBack && (
+                <button
+                  onClick={handleBack}
+                  className="px-6 py-3 font-medium transition-all bg-gray-200 text-gray-800 hover:bg-gray-300 cursor-pointer"
+                  aria-label="Go back to previous step"
+                  data-testid="back-button"
+                >
+                  Back
+                </button>
+              )}
+            </div>
+          ) : (
+            <NavigationButtons
+              onBack={handleBack}
+              onNext={handleNext}
+              canGoBack={canGoBack}
+              isLastStep={isLastStep}
+            />
+          )}
         </main>
       </div>
     </div>

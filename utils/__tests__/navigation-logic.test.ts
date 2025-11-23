@@ -41,8 +41,49 @@ describe('navigation-logic', () => {
       expect(getNextStep('current-device', emptyAnswers)).toBe('last-device-update');
     });
 
-    it('should navigate from last-device-update to last-sensors-ordered', () => {
-      expect(getNextStep('last-device-update', emptyAnswers)).toBe('last-sensors-ordered');
+    it('should navigate from last-device-update to last-sensors-ordered when eligible', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        currentDevice: 'dexcom-g7',
+        lastDeviceUpdate: '0-1-year',
+      };
+      expect(getNextStep('last-device-update', answers)).toBe('last-sensors-ordered');
+    });
+
+    it('should navigate from last-device-update to ineligible-selection when device is "other" and update is 0-1 year', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        currentDevice: 'other',
+        lastDeviceUpdate: '0-1-year',
+      };
+      expect(getNextStep('last-device-update', answers)).toBe('ineligible-selection');
+    });
+
+    it('should navigate from last-device-update to ineligible-selection when device is "other" and update is 1-3 years', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        currentDevice: 'other',
+        lastDeviceUpdate: '1-3-years',
+      };
+      expect(getNextStep('last-device-update', answers)).toBe('ineligible-selection');
+    });
+
+    it('should navigate from last-device-update to ineligible-selection when device is "other" and update is 3-4 years', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        currentDevice: 'other',
+        lastDeviceUpdate: '3-4-years',
+      };
+      expect(getNextStep('last-device-update', answers)).toBe('ineligible-selection');
+    });
+
+    it('should navigate from last-device-update to last-sensors-ordered when device is "other" and update is 5+ years', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        currentDevice: 'other',
+        lastDeviceUpdate: '5-plus-years',
+      };
+      expect(getNextStep('last-device-update', answers)).toBe('last-sensors-ordered');
     });
 
     it('should navigate from last-sensors-ordered to device-switch-intention', () => {
@@ -71,6 +112,10 @@ describe('navigation-logic', () => {
 
     it('should navigate from last-doctor-visit to summary', () => {
       expect(getNextStep('last-doctor-visit', emptyAnswers)).toBe('summary');
+    });
+
+    it('should return null when on ineligible-selection (end of flow)', () => {
+      expect(getNextStep('ineligible-selection', emptyAnswers)).toBeNull();
     });
 
     it('should return null when on summary (end of flow)', () => {
@@ -200,6 +245,10 @@ describe('navigation-logic', () => {
       expect(canProceed('last-doctor-visit', answers)).toBe(true);
     });
 
+    it('should return true for ineligible-selection step', () => {
+      expect(canProceed('ineligible-selection', emptyAnswers)).toBe(true);
+    });
+
     it('should return true for summary step', () => {
       expect(canProceed('summary', emptyAnswers)).toBe(true);
     });
@@ -236,6 +285,10 @@ describe('navigation-logic', () => {
 
     it('should return correct title for last-doctor-visit', () => {
       expect(getStepTitle('last-doctor-visit')).toBe('Last Doctor Visit');
+    });
+
+    it('should return correct title for ineligible-selection', () => {
+      expect(getStepTitle('ineligible-selection')).toBe('Ineligible for Equipment');
     });
 
     it('should return correct title for summary', () => {
@@ -278,6 +331,10 @@ describe('navigation-logic', () => {
       expect(getStepQuestion('last-doctor-visit')).toBe(
         'Have you seen your primary care physician in the last 6 months?'
       );
+    });
+
+    it('should return correct question for ineligible-selection', () => {
+      expect(getStepQuestion('ineligible-selection')).toBe('Eligibility Status');
     });
 
     it('should return correct question for summary', () => {
@@ -390,6 +447,10 @@ describe('navigation-logic', () => {
     it('should return null for last-doctor-visit when answer is false', () => {
       const answers = { ...emptyAnswers, lastDoctorVisit: false };
       expect(getValidationError('last-doctor-visit', answers)).toBeNull();
+    });
+
+    it('should return null for ineligible-selection step', () => {
+      expect(getValidationError('ineligible-selection', emptyAnswers)).toBeNull();
     });
 
     it('should return null for summary step', () => {

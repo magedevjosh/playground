@@ -11,6 +11,10 @@ export function getNextStep(currentStep: StepId, answers: FlowAnswers): StepId |
       return 'last-device-update';
 
     case 'last-device-update':
+      // Check eligibility: if device is "other" and update is not 5+ years, they're ineligible
+      if (answers.currentDevice === 'other' && answers.lastDeviceUpdate !== '5-plus-years') {
+        return 'ineligible-selection';
+      }
       return 'last-sensors-ordered';
 
     case 'last-sensors-ordered':
@@ -26,6 +30,9 @@ export function getNextStep(currentStep: StepId, answers: FlowAnswers): StepId |
 
     case 'last-doctor-visit':
       return 'summary';
+
+    case 'ineligible-selection':
+      return null; // End of flow - user must go back or start over
 
     case 'summary':
       return null; // End of flow
@@ -70,6 +77,9 @@ export function canProceed(currentStep: StepId, answers: FlowAnswers): boolean {
     case 'last-doctor-visit':
       return answers.lastDoctorVisit !== null;
 
+    case 'ineligible-selection':
+      return true; // Can proceed (but will go back or start over)
+
     case 'summary':
       return true; // Can always proceed from summary (to complete)
 
@@ -94,6 +104,8 @@ export function getStepTitle(step: StepId): string {
       return 'Device Selection';
     case 'last-doctor-visit':
       return 'Last Doctor Visit';
+    case 'ineligible-selection':
+      return 'Ineligible for Equipment';
     case 'summary':
       return 'Summary';
     default:
@@ -117,6 +129,8 @@ export function getStepQuestion(step: StepId): string {
       return 'Which CGM device would you like to select?';
     case 'last-doctor-visit':
       return 'Have you seen your primary care physician in the last 6 months?';
+    case 'ineligible-selection':
+      return 'Eligibility Status';
     case 'summary':
       return 'Review Your Selections';
     default:
@@ -160,6 +174,9 @@ export function getValidationError(currentStep: StepId, answers: FlowAnswers): s
       return answers.lastDoctorVisit === null
         ? 'Please indicate whether you have seen your primary care physician in the last 6 months.'
         : null;
+
+    case 'ineligible-selection':
+      return null; // No validation needed on ineligible selection
 
     case 'summary':
       return null; // No validation needed on summary

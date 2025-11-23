@@ -124,7 +124,7 @@ describe('DeviceSelection', () => {
     });
   });
 
-  it('should filter out current device but still show 3 remaining devices', () => {
+  it('should filter out current device but still show 4 remaining devices', () => {
     render(
       <DeviceSelection 
         value={null} 
@@ -134,9 +134,9 @@ describe('DeviceSelection', () => {
       />
     );
     
-    // Should have 3 devices (4 total - 1 current)
+    // Should have 4 devices (5 total - 1 current)
     const deviceCards = screen.getAllByRole('button', { pressed: false });
-    expect(deviceCards).toHaveLength(3);
+    expect(deviceCards).toHaveLength(4);
     
     // Specific checks
     expect(screen.queryByTestId('device-card-libre-freestyle-3')).not.toBeInTheDocument();

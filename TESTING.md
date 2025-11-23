@@ -45,6 +45,11 @@ pnpm test:coverage
 - **`components/cgm-flow/steps/__tests__/DeviceSelection.test.tsx`**
   - Device card rendering
   - Device selection interaction
+
+- **`components/cgm-flow/steps/__tests__/IneligibleSelection.test.tsx`**
+  - Ineligibility message display
+  - Customer support phone link functionality
+  - Component styling and accessibility
   
 - **`components/cgm-flow/steps/__tests__/Summary.test.tsx`**
   - Conditional rendering of answers
@@ -68,13 +73,14 @@ pnpm test:coverage
 
 ## Test Coverage
 
-The test suite includes **149 tests** covering:
-- ✅ All navigation logic functions
+The test suite includes **168 tests** covering:
+- ✅ All navigation logic functions (including eligibility checks)
 - ✅ State management and persistence
 - ✅ User interactions and form inputs
 - ✅ Conditional rendering
 - ✅ Accessibility attributes
-- ✅ Complex multi-step flows
+- ✅ Complex multi-step flows (including ineligibility paths)
+- ✅ Eligibility verification logic
 
 ## Configuration
 
