@@ -38,6 +38,7 @@ export default function FlowContainer() {
     currentStep: 'currently-using-cgm',
     answers: initialAnswers,
     stepHistory: ['currently-using-cgm'],
+    returnToSummary: false,
   });
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -116,6 +117,7 @@ export default function FlowContainer() {
       currentStep: 'currently-using-cgm',
       answers: initialAnswers,
       stepHistory: ['currently-using-cgm'],
+      returnToSummary: false,
     });
     setValidationError(null);
   };
@@ -126,8 +128,54 @@ export default function FlowContainer() {
       currentStep: 'currently-using-cgm',
       answers: initialAnswers,
       stepHistory: ['currently-using-cgm'],
+      returnToSummary: false,
     });
     setValidationError(null);
+  };
+
+  const handleEditFromSummary = (stepId: StepId) => {
+    setFlowState((prev) => {
+      // Find if this step exists in the history
+      const stepIndex = prev.stepHistory.findIndex(s => s === stepId);
+      
+      // If step exists in history, truncate history to that point
+      // This allows proper back navigation
+      const newStepHistory = stepIndex >= 0 
+        ? prev.stepHistory.slice(0, stepIndex + 1)
+        : [...prev.stepHistory.filter(s => s !== 'summary'), stepId];
+      
+      return {
+        ...prev,
+        currentStep: stepId,
+        stepHistory: newStepHistory,
+        returnToSummary: true,
+      };
+    });
+    setValidationError(null);
+  };
+
+  const handleReturnToSummary = () => {
+    // Check if current answers would make user ineligible
+    const isIneligible = 
+      flowState.answers.currentDevice === 'other' && 
+      flowState.answers.lastDeviceUpdate !== null &&
+      flowState.answers.lastDeviceUpdate !== '5-plus-years';
+    
+    if (isIneligible) {
+      // Show validation error instead of returning to summary
+      setValidationError(
+        'You must select "5+ Years" for your last device update to return to the summary, or click "Next" to continue.'
+      );
+      return;
+    }
+    
+    // Clear any validation errors and return to summary
+    setValidationError(null);
+    setFlowState((prev) => ({
+      ...prev,
+      currentStep: 'summary',
+      returnToSummary: false,
+    }));
   };
 
   const canGoBack = flowState.stepHistory.length > 1;
@@ -214,7 +262,7 @@ export default function FlowContainer() {
         );
 
       case 'summary':
-        return <Summary answers={flowState.answers} />;
+        return <Summary answers={flowState.answers} onEditStep={handleEditFromSummary} />;
 
       default:
         return <div>Unknown step</div>;
@@ -289,6 +337,8 @@ export default function FlowContainer() {
               onNext={handleNext}
               canGoBack={canGoBack}
               isLastStep={isLastStep}
+              returnToSummary={flowState.returnToSummary}
+              onReturnToSummary={handleReturnToSummary}
             />
           )}
         </main>

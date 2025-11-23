@@ -6,10 +6,12 @@ import NavigationButtons from '../NavigationButtons';
 describe('NavigationButtons', () => {
   const mockOnBack = vi.fn();
   const mockOnNext = vi.fn();
+  const mockOnReturnToSummary = vi.fn();
 
   beforeEach(() => {
     mockOnBack.mockClear();
     mockOnNext.mockClear();
+    mockOnReturnToSummary.mockClear();
   });
 
   describe('Back Button', () => {
@@ -214,6 +216,121 @@ describe('NavigationButtons', () => {
       
       expect(backButton).toHaveClass('px-6', 'py-3');
       expect(nextButton).toHaveClass('px-6', 'py-3');
+    });
+  });
+
+  describe('Return to Summary Mode', () => {
+    it('should render Return to Summary button when returnToSummary is true', () => {
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={true}
+          returnToSummary={true}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      expect(screen.getByTestId('return-to-summary-button')).toBeInTheDocument();
+      expect(screen.getByText('Return to Summary')).toBeInTheDocument();
+    });
+
+    it('should render all three buttons when in return to summary mode with canGoBack true', () => {
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={true}
+          returnToSummary={true}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      expect(screen.getByTestId('back-button')).toBeInTheDocument();
+      expect(screen.getByTestId('return-to-summary-button')).toBeInTheDocument();
+      expect(screen.getByTestId('next-button')).toBeInTheDocument();
+    });
+
+    it('should not render back button when in return to summary mode with canGoBack false', () => {
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={false}
+          returnToSummary={true}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      expect(screen.queryByTestId('back-button')).not.toBeInTheDocument();
+      expect(screen.getByTestId('return-to-summary-button')).toBeInTheDocument();
+      expect(screen.getByTestId('next-button')).toBeInTheDocument();
+    });
+
+    it('should call onReturnToSummary when Return to Summary button is clicked', async () => {
+      const user = userEvent.setup();
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={true}
+          returnToSummary={true}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      const returnButton = screen.getByTestId('return-to-summary-button');
+      await user.click(returnButton);
+      
+      expect(mockOnReturnToSummary).toHaveBeenCalledTimes(1);
+    });
+
+    it('should have correct aria-label for Return to Summary button', () => {
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={true}
+          returnToSummary={true}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      const returnButton = screen.getByTestId('return-to-summary-button');
+      expect(returnButton).toHaveAttribute('aria-label', 'Return to summary');
+    });
+
+    it('should show Next button (not Complete) in return to summary mode even on last step', () => {
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={true}
+          isLastStep={true}
+          returnToSummary={true}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      expect(screen.getByTestId('next-button')).toBeInTheDocument();
+      expect(screen.getByText('Next')).toBeInTheDocument();
+      expect(screen.queryByText('Complete')).not.toBeInTheDocument();
+    });
+
+    it('should use standard layout when returnToSummary is false', () => {
+      render(
+        <NavigationButtons
+          onBack={mockOnBack}
+          onNext={mockOnNext}
+          canGoBack={true}
+          returnToSummary={false}
+          onReturnToSummary={mockOnReturnToSummary}
+        />
+      );
+      
+      expect(screen.getByTestId('back-button')).toBeInTheDocument();
+      expect(screen.queryByTestId('return-to-summary-button')).not.toBeInTheDocument();
+      expect(screen.getByTestId('next-button')).toBeInTheDocument();
     });
   });
 });

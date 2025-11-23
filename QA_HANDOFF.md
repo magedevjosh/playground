@@ -63,6 +63,7 @@ The CGM Device Selection Flow streamlines the process of helping patients identi
 2. **Session Persistence:** Progress is saved automatically (via localStorage)
 3. **Easy Navigation:** Back button allows users to review/change answers
 4. **Clear Summary:** Final review screen shows all selections before completion
+5. **Edit from Summary:** Users can click any field heading on the Summary page to edit that specific answer and return
 
 ---
 
@@ -137,8 +138,21 @@ The CGM Device Selection Flow streamlines the process of helping patients identi
 - [ ] Boolean values display as "Yes" or "No"
 - [ ] Complete button is visible and enabled
 - [ ] Message displayed: "Thank you for completing the CGM device selection experience"
+- [ ] Each field heading is clickable (appears as a link with hover effect)
+- [ ] Clicking a field heading navigates to that specific step
 
-#### FR-10: Device Selection
+#### FR-10: Edit from Summary
+- [ ] When navigating from Summary to a step, a "Return to Summary" button appears
+- [ ] When in edit mode, three buttons are shown: Back, Return to Summary, and Next
+- [ ] Clicking "Return to Summary" returns user to Summary page with any changes saved
+- [ ] User can edit an answer and click "Return to Summary" without affecting flow
+- [ ] User can edit an answer and click "Next" to continue through normal flow
+- [ ] User can use "Back" button normally while in edit mode
+- [ ] Multiple fields can be edited sequentially from Summary
+- [ ] Changes made during edit mode are reflected immediately on Summary
+- [ ] "Return to Summary" button is only shown when navigating from Summary (not during normal flow)
+
+#### FR-11: Device Selection
 - [ ] All 5 devices are displayed with correct information
 - [ ] Each device shows: name, description, icon placeholder
 - [ ] Clicking a device card selects it (visual feedback with styling change)
@@ -913,6 +927,381 @@ For each time range (0-1 months, 1-3 months, 3-6 months, 6+ months):
 
 ---
 
+### Edit from Summary Scenarios
+
+#### TC-029: Edit Single Field from Summary
+**Priority:** High  
+**Objective:** Verify user can edit a single field from the Summary page and return
+
+**Preconditions:**
+- Application is loaded
+- User has completed the full flow and is on Summary page
+
+**Steps:**
+1. Complete any full flow path to reach Summary
+2. Note the value displayed for "Current Device" (or any field)
+3. Click on the "Current Device" heading
+4. Verify you navigate to the "Current Device" step
+5. Verify the "Return to Summary" button is visible
+6. Verify three buttons are shown: Back, Return to Summary, Next
+7. Change the device selection to a different device
+8. Click "Return to Summary" button
+9. Verify you're back on the Summary page
+10. Verify the "Current Device" field shows the new device
+11. Verify other fields remain unchanged
+12. Click "Complete" button
+
+**Expected Results:**
+- Field heading is clickable with hover effect
+- Navigation to specific step works correctly
+- Return to Summary button appears and functions
+- Changed value is reflected on Summary
+- Other answers are preserved
+- Flow can still be completed
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-030: Edit Multiple Fields from Summary
+**Priority:** High  
+**Objective:** Verify user can edit multiple different fields from Summary
+
+**Preconditions:**
+- User has completed the full flow and is on Summary page
+
+**Steps:**
+1. Complete the longest flow path (existing user who wants to switch)
+2. On Summary, click "Current Device" heading
+3. Change the device selection
+4. Click "Return to Summary"
+5. Verify you're back on Summary with updated device
+6. Click "Device Switch Intention" heading
+7. Change the answer
+8. Click "Return to Summary"
+9. Verify you're back on Summary with updated answer
+10. Click "Last Doctor Visit" heading
+11. Change the answer
+12. Click "Return to Summary"
+13. Verify all three changes are reflected on Summary
+14. Click "Complete"
+
+**Expected Results:**
+- Multiple fields can be edited sequentially
+- Each return to Summary preserves all previous changes
+- Summary always shows the most current values
+- No data loss occurs
+- Flow can be completed after multiple edits
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-031: Use Next Button During Edit from Summary
+**Priority:** Medium  
+**Objective:** Verify clicking Next while in edit mode continues normal flow
+
+**Preconditions:**
+- User has completed the flow and is on Summary page
+
+**Steps:**
+1. Complete the flow to reach Summary
+2. Click on a field heading that has multiple steps after it (e.g., "Current Device")
+3. Verify "Return to Summary" button is visible
+4. Make a change to the selection
+5. Click "Next" button (not Return to Summary)
+6. Verify you proceed to the next step in the normal flow
+7. Verify "Return to Summary" button is still visible
+8. Continue clicking "Next" through several steps
+9. Click "Return to Summary" from any step
+10. Verify you return to Summary
+11. Verify all changes made during the flow are reflected
+
+**Expected Results:**
+- Next button continues normal flow progression
+- Return to Summary button remains available through multiple steps
+- Can return to Summary from any step reached during edit mode
+- All changes are preserved
+- Flow logic remains correct
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-032: Use Back Button During Edit from Summary
+**Priority:** Medium  
+**Objective:** Verify Back button works correctly when in edit mode from Summary
+
+**Preconditions:**
+- User has completed the flow and is on Summary page
+
+**Steps:**
+1. Complete the flow to reach Summary
+2. Click on "Last Sensors Ordered" heading (a middle step)
+3. Verify "Return to Summary" button is visible
+4. Click "Back" button
+5. Verify you go to the previous step ("Last Device Update")
+6. Verify "Return to Summary" button is still visible
+7. Click "Back" again
+8. Verify you go to "Current Device"
+9. Verify "Return to Summary" button is still visible
+10. Make a change
+11. Click "Return to Summary"
+12. Verify you return to Summary with the change reflected
+
+**Expected Results:**
+- Back button functions normally during edit mode
+- Return to Summary button persists when using Back
+- Can navigate backward multiple steps
+- Can return to Summary from any step
+- Changes are preserved
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-033: Edit from Summary - All Clickable Fields
+**Priority:** High  
+**Objective:** Verify all field headings on Summary are clickable and navigate correctly
+
+**Preconditions:**
+- User has completed the longest flow path
+
+**Steps:**
+1. Complete the existing user switching devices flow (8 steps total)
+2. On Summary, note all displayed field headings:
+   - Currently Using CGM
+   - Current Device
+   - Last Device Update
+   - Last Sensors Ordered
+   - Interested in Switching
+   - Selected Device
+   - Seen Doctor in Last 6 Months
+3. For each field heading:
+   a. Click the heading
+   b. Verify navigation to the correct step
+   c. Verify "Return to Summary" button appears
+   d. Click "Return to Summary"
+   e. Verify return to Summary page
+
+**Expected Results:**
+- All field headings are clickable
+- Each heading navigates to its corresponding step
+- Return to Summary works from every step
+- No errors occur
+- Navigation is always correct
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-034: Edit from Summary - Conditional Field Visibility
+**Priority:** Medium  
+**Objective:** Verify only answered fields are clickable on Summary
+
+**Preconditions:**
+- Application is loaded
+
+**Steps:**
+1. Complete the shortest flow path (new user - 4 steps)
+2. On Summary, verify only these fields are displayed and clickable:
+   - Currently Using CGM
+   - Selected Device
+   - Seen Doctor in Last 6 Months
+3. Verify these fields are NOT displayed (because they weren't answered):
+   - Current Device
+   - Last Device Update
+   - Last Sensors Ordered
+   - Interested in Switching
+4. Click each visible field heading to verify it works
+5. Return to Summary after each edit
+
+**Expected Results:**
+- Only answered fields appear on Summary
+- Only displayed field headings are clickable
+- Navigation works correctly for all visible fields
+- No errors or null references occur
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-035: Edit from Summary - State Persistence
+**Priority:** High  
+**Objective:** Verify edit mode state is handled correctly with page reload
+
+**Preconditions:**
+- User has completed the flow and is on Summary page
+
+**Steps:**
+1. Complete a full flow to reach Summary
+2. Click on a field heading to enter edit mode
+3. Verify "Return to Summary" button is visible
+4. Reload the page (F5 or Cmd+R)
+5. Wait for page to reload
+6. Verify the correct step is displayed
+7. Verify "Return to Summary" button is NOT visible (normal mode restored)
+8. Make a change if needed
+9. Click "Next" to continue normal flow
+10. Verify flow progression is normal (not in edit mode)
+
+**Expected Results:**
+- Page reload resets edit mode
+- User remains on the current step
+- Return to Summary button disappears after reload
+- Flow continues in normal mode
+- No errors or state corruption
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-036: Edit from Summary - Visual Feedback
+**Priority:** Medium  
+**Objective:** Verify proper visual feedback for clickable field headings
+
+**Preconditions:**
+- User has completed the flow and is on Summary page
+
+**Steps:**
+1. Complete any flow to reach Summary
+2. Hover mouse over different field headings
+3. Verify visual feedback on hover (cursor change, color change, underline)
+4. Move mouse away and verify styling returns to normal
+5. Click a field heading
+6. Navigate to that step
+7. Verify the heading text was clear and the navigation was expected
+8. Return to Summary
+9. Test hover behavior on all field headings
+
+**Expected Results:**
+- Field headings show clear hover state (cursor pointer)
+- Hover styling indicates clickability (color change, underline)
+- Visual feedback is consistent across all fields
+- Accessibility is maintained (keyboard focus states)
+- No confusion about what is clickable
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-037: Edit from Summary - Return Button Appearance
+**Priority:** Medium  
+**Objective:** Verify Return to Summary button only appears when appropriate
+
+**Preconditions:**
+- Application is loaded
+
+**Steps:**
+1. Start a new flow from step 1
+2. Progress through steps 1-3 normally
+3. Verify "Return to Summary" button is NOT visible
+4. Complete the flow to reach Summary
+5. Click "Back" from Summary
+6. Verify "Return to Summary" button is NOT visible (normal back navigation)
+7. Navigate forward to Summary again
+8. Click a field heading to edit
+9. Verify "Return to Summary" button IS visible
+10. Click "Back"
+11. Verify "Return to Summary" button IS still visible
+12. Click "Start Over"
+13. Progress through flow normally
+14. Verify "Return to Summary" button never appears during normal flow
+
+**Expected Results:**
+- Button only appears when navigating from Summary via field heading
+- Button persists when using Back/Next during edit mode
+- Button does NOT appear during normal flow progression
+- Button does NOT appear when using Back from Summary
+- Behavior is consistent and predictable
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-038: Validation - Cannot Return to Summary with Ineligible Answers
+**Priority:** High  
+**Objective:** Verify validation prevents returning to Summary when answers make user ineligible
+
+**Preconditions:**
+- Application is loaded
+- No localStorage data exists
+
+**Steps:**
+1. Complete flow with the following path:
+   - Currently Using CGM: Yes
+   - Current Device: "I don't see my device"
+   - Last Device Update: "5+ Years" (eligible)
+   - Last Sensors Ordered: "0-1 months"
+   - Device Switch Intention: Yes
+   - Device Selection: "Dexcom G7"
+   - Last Doctor Visit: Yes
+2. Verify you reach Summary page
+3. Click "Last Device Update" heading to edit
+4. Verify you navigate to Last Device Update step
+5. Change selection to "0-1 Year" (ineligible answer)
+6. Click "Return to Summary" button
+7. Verify validation error message appears:
+   - Message should say: "You must select '5+ Years' for your last device update to return to the summary, or click 'Next' to continue."
+8. Verify you remain on Last Device Update step
+9. Verify Summary is NOT displayed
+10. Click "Next" button
+11. Verify you navigate to "Ineligible for Equipment" step
+12. Verify phone number and ineligibility message are displayed
+
+**Expected Results:**
+- Return to Summary button is blocked when answers are ineligible
+- Clear validation error message explains why user cannot return
+- User remains on current step when validation fails
+- Next button still works and proceeds to Ineligible Selection step
+- Normal flow logic remains intact
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-039: Validation - Can Return After Fixing Ineligible Answer
+**Priority:** High  
+**Objective:** Verify user can return to Summary after changing answer from ineligible to eligible
+
+**Preconditions:**
+- Application is loaded
+- Following TC-038 setup through step 7 (validation error showing)
+
+**Steps:**
+1. Start from Last Device Update step with validation error showing
+2. Verify validation error is visible
+3. Change selection back to "5+ Years"
+4. Click "Return to Summary" button
+5. Verify you navigate back to Summary page
+6. Verify "Your CGM Experience Profile" is displayed
+7. Verify validation error is no longer visible
+8. Verify "Last Device Update" field shows "5+ Years"
+9. Verify all other fields remain unchanged
+10. Click "Complete" button to verify flow can be completed
+
+**Expected Results:**
+- Changing answer to eligible value clears validation error
+- Return to Summary button works after fixing the answer
+- Updated answer is reflected on Summary page
+- Other answers are preserved
+- Flow can be completed successfully
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
 #### TC-027: Ineligible User Flow - Device "Other" with Recent Update
 **Priority:** Critical  
 **Objective:** Verify ineligibility detection when user selects "I don't see my device" and update < 5 years
@@ -1282,6 +1671,8 @@ For automated testing reference, see the [Playwright Testing Guide](PLAYWRIGHT_T
 - `back-button` - Back navigation button
 - `next-button` - Next/Continue button
 - `complete-button` - Complete button (on summary)
+- `return-to-summary-button` - Return to Summary button (edit mode)
+- `edit-{step-id}` - Edit buttons on Summary (e.g., `edit-current-device`)
 - `radio-option-{value}` - Radio button labels (e.g., `radio-option-yes`)
 - `radio-input-{value}` - Radio input elements
 - `device-card-{device-id}` - Device cards (e.g., `device-card-dexcom-g7`)
@@ -1391,7 +1782,7 @@ When reporting bugs found during QA, please include:
 **Test Environment:** [Development/Staging/Production]
 
 **Test Summary:**
-- Total Test Cases: 28
+- Total Test Cases: 39
 - Passed: [To be filled]
 - Failed: [To be filled]
 - Blocked: [To be filled]

@@ -1,10 +1,11 @@
-import { FlowAnswers, DEVICES, TIME_RANGES } from '@/types/cgm-flow';
+import { FlowAnswers, DEVICES, TIME_RANGES, StepId } from '@/types/cgm-flow';
 
 interface SummaryProps {
   answers: FlowAnswers;
+  onEditStep?: (stepId: StepId) => void;
 }
 
-export default function Summary({ answers }: SummaryProps) {
+export default function Summary({ answers, onEditStep }: SummaryProps) {
   const getDeviceName = (deviceId: string | null) => {
     if (!deviceId) return 'Not specified';
     const device = DEVICES.find((d) => d.id === deviceId);
@@ -30,20 +31,44 @@ export default function Summary({ answers }: SummaryProps) {
         </h3>
         <div className="space-y-4">
           <div>
-            <dt className="text-sm font-medium text-gray-600 mb-1">Currently Using CGM</dt>
+            <dt className="text-sm font-medium mb-1">
+              <button
+                onClick={() => onEditStep?.('currently-using-cgm')}
+                className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                data-testid="edit-currently-using-cgm"
+              >
+                Currently Using CGM
+              </button>
+            </dt>
             <dd className="text-base text-gray-900">{formatBoolean(answers.currentlyUsingCGM)}</dd>
           </div>
 
           {answers.currentDevice && (
             <div>
-              <dt className="text-sm font-medium text-gray-600 mb-1">Current Device</dt>
+              <dt className="text-sm font-medium mb-1">
+                <button
+                  onClick={() => onEditStep?.('current-device')}
+                  className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                  data-testid="edit-current-device"
+                >
+                  Current Device
+                </button>
+              </dt>
               <dd className="text-base text-gray-900">{getDeviceName(answers.currentDevice)}</dd>
             </div>
           )}
 
           {answers.lastDeviceUpdate && (
             <div>
-              <dt className="text-sm font-medium text-gray-600 mb-1">Last Device Update</dt>
+              <dt className="text-sm font-medium mb-1">
+                <button
+                  onClick={() => onEditStep?.('last-device-update')}
+                  className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                  data-testid="edit-last-device-update"
+                >
+                  Last Device Update
+                </button>
+              </dt>
               <dd className="text-base text-gray-900">
                 {getTimeRangeLabel(answers.lastDeviceUpdate, 'deviceUpdate')}
               </dd>
@@ -52,7 +77,15 @@ export default function Summary({ answers }: SummaryProps) {
 
           {answers.lastSensorsOrdered && (
             <div>
-              <dt className="text-sm font-medium text-gray-600 mb-1">Last Sensors Ordered</dt>
+              <dt className="text-sm font-medium mb-1">
+                <button
+                  onClick={() => onEditStep?.('last-sensors-ordered')}
+                  className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                  data-testid="edit-last-sensors-ordered"
+                >
+                  Last Sensors Ordered
+                </button>
+              </dt>
               <dd className="text-base text-gray-900">
                 {getTimeRangeLabel(answers.lastSensorsOrdered, 'sensorsOrdered')}
               </dd>
@@ -61,7 +94,15 @@ export default function Summary({ answers }: SummaryProps) {
 
           {answers.deviceSwitchIntention !== null && (
             <div>
-              <dt className="text-sm font-medium text-gray-600 mb-1">Interested in Switching</dt>
+              <dt className="text-sm font-medium mb-1">
+                <button
+                  onClick={() => onEditStep?.('device-switch-intention')}
+                  className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                  data-testid="edit-device-switch-intention"
+                >
+                  Interested in Switching
+                </button>
+              </dt>
               <dd className="text-base text-gray-900">
                 {formatBoolean(answers.deviceSwitchIntention)}
               </dd>
@@ -70,15 +111,29 @@ export default function Summary({ answers }: SummaryProps) {
 
           {answers.deviceSelection && (
             <div>
-              <dt className="text-sm font-medium text-gray-600 mb-1">Selected Device</dt>
+              <dt className="text-sm font-medium mb-1">
+                <button
+                  onClick={() => onEditStep?.('device-selection')}
+                  className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                  data-testid="edit-device-selection"
+                >
+                  Selected Device
+                </button>
+              </dt>
               <dd className="text-base text-gray-900">{getDeviceName(answers.deviceSelection)}</dd>
             </div>
           )}
 
           {answers.lastDoctorVisit !== null && (
             <div>
-              <dt className="text-sm font-medium text-gray-600 mb-1">
-                Seen Doctor in Last 6 Months
+              <dt className="text-sm font-medium mb-1">
+                <button
+                  onClick={() => onEditStep?.('last-doctor-visit')}
+                  className="text-gray-600 hover:text-primary-dark hover:underline cursor-pointer text-left w-full"
+                  data-testid="edit-last-doctor-visit"
+                >
+                  Seen Doctor in Last 6 Months
+                </button>
               </dt>
               <dd className="text-base text-gray-900">{formatBoolean(answers.lastDoctorVisit)}</dd>
             </div>

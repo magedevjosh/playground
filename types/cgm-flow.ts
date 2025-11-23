@@ -23,6 +23,7 @@ export interface FlowState {
   currentStep: StepId;
   answers: FlowAnswers;
   stepHistory: StepId[];
+  returnToSummary?: boolean; // Track if user is editing from summary page
 }
 
 export interface Device {
@@ -68,6 +69,12 @@ export const DEVICES: Device[] = [
     name: 'I don\'t see my device',
     description: 'Select this option if your device is not listed above.',
     imagePlaceholder: '❓',
+  },
+  {
+    id: 'no-preference',
+    name: 'No Preference',
+    description: 'I would like assistance in choosing the right device for me.',
+    imagePlaceholder: '💡',
   },
 ];
 

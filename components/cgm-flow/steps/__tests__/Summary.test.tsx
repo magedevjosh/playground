@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Summary from '../Summary';
 import { FlowAnswers } from '@/types/cgm-flow';
 
@@ -158,6 +159,121 @@ describe('Summary', () => {
     
     // The component should show the invalid id as-is since it's not found
     expect(screen.getByText('invalid-device-id')).toBeInTheDocument();
+  });
+
+  describe('Edit functionality', () => {
+    it('should call onEditStep with correct step id when clicking Currently Using CGM', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-currently-using-cgm');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('currently-using-cgm');
+    });
+
+    it('should call onEditStep with correct step id when clicking Current Device', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-current-device');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('current-device');
+    });
+
+    it('should call onEditStep with correct step id when clicking Last Device Update', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-last-device-update');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('last-device-update');
+    });
+
+    it('should call onEditStep with correct step id when clicking Last Sensors Ordered', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-last-sensors-ordered');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('last-sensors-ordered');
+    });
+
+    it('should call onEditStep with correct step id when clicking Interested in Switching', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-device-switch-intention');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('device-switch-intention');
+    });
+
+    it('should call onEditStep with correct step id when clicking Selected Device', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-device-selection');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('device-selection');
+    });
+
+    it('should call onEditStep with correct step id when clicking Last Doctor Visit', async () => {
+      const user = userEvent.setup();
+      const mockOnEditStep = vi.fn();
+      render(<Summary answers={fullAnswers} onEditStep={mockOnEditStep} />);
+
+      const editButton = screen.getByTestId('edit-last-doctor-visit');
+      await user.click(editButton);
+
+      expect(mockOnEditStep).toHaveBeenCalledWith('last-doctor-visit');
+    });
+
+    it('should not crash when onEditStep is not provided', async () => {
+      const user = userEvent.setup();
+      render(<Summary answers={fullAnswers} />);
+
+      const editButton = screen.getByTestId('edit-currently-using-cgm');
+      await user.click(editButton);
+
+      // Should not throw an error
+      expect(true).toBe(true);
+    });
+
+    it('should only show edit buttons for sections that have answers', () => {
+      const minimalAnswers: FlowAnswers = {
+        currentlyUsingCGM: false,
+        currentDevice: null,
+        lastDeviceUpdate: null,
+        lastSensorsOrdered: null,
+        deviceSwitchIntention: null,
+        deviceSelection: 'dexcom-g7',
+        lastDoctorVisit: false,
+      };
+      
+      render(<Summary answers={minimalAnswers} onEditStep={vi.fn()} />);
+
+      // Should have edit buttons for answered questions
+      expect(screen.getByTestId('edit-currently-using-cgm')).toBeInTheDocument();
+      expect(screen.getByTestId('edit-device-selection')).toBeInTheDocument();
+      expect(screen.getByTestId('edit-last-doctor-visit')).toBeInTheDocument();
+
+      // Should not have edit buttons for unanswered questions
+      expect(screen.queryByTestId('edit-current-device')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('edit-last-device-update')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('edit-last-sensors-ordered')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('edit-device-switch-intention')).not.toBeInTheDocument();
+    });
   });
 });
 

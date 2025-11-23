@@ -36,6 +36,10 @@ pnpm test:coverage
   - LocalStorage persistence
   - Start over functionality
   - Complex navigation paths for different user scenarios
+  - Edit from Summary navigation
+  - Return to Summary functionality
+  - Multi-field editing from summary
+  - Validation for ineligible answers when returning to summary
 
 #### Step Components
 - **`components/cgm-flow/steps/__tests__/CurrentlyUsingCGM.test.tsx`**
@@ -54,12 +58,16 @@ pnpm test:coverage
 - **`components/cgm-flow/steps/__tests__/Summary.test.tsx`**
   - Conditional rendering of answers
   - Data formatting and display
+  - Edit functionality (clickable section headings)
+  - Navigation to specific steps from summary
 
 #### UI Components
 - **`components/cgm-flow/ui/__tests__/NavigationButtons.test.tsx`**
   - Button enable/disable states
   - Back/Next/Complete button rendering
   - Click handlers
+  - Return to Summary button in edit mode
+  - Three-button layout when editing from summary
   
 - **`components/cgm-flow/ui/__tests__/RadioOption.test.tsx`**
   - Radio input functionality
@@ -73,7 +81,7 @@ pnpm test:coverage
 
 ## Test Coverage
 
-The test suite includes **168 tests** covering:
+The test suite includes **216 tests** covering:
 - ✅ All navigation logic functions (including eligibility checks)
 - ✅ State management and persistence
 - ✅ User interactions and form inputs

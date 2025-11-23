@@ -13,26 +13,42 @@ describe('DeviceSelection', () => {
     mockOnNext.mockClear();
   });
 
-  it('should render all device options', () => {
-    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+  it('should always render "No Preference" option', () => {
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
-    DEVICES.forEach((device) => {
-      expect(screen.getByText(device.name)).toBeInTheDocument();
-      expect(screen.getByText(device.description)).toBeInTheDocument();
-    });
+    // Should always show "no-preference" and never show "other"
+    expect(screen.getByText('No Preference')).toBeInTheDocument();
+    expect(screen.queryByText('I don\'t see my device')).not.toBeInTheDocument();
   });
 
-  it('should render all device cards with correct test ids', () => {
-    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+  it('should never render "I don\'t see my device" option', () => {
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
-    DEVICES.forEach((device) => {
-      expect(screen.getByTestId(`device-card-${device.id}`)).toBeInTheDocument();
-    });
+    // Should never show "other"
+    expect(screen.queryByTestId('device-card-other')).not.toBeInTheDocument();
   });
 
   it('should call onChange with device id when a device is clicked', async () => {
     const user = userEvent.setup();
-    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
     const dexcomG7Card = screen.getByTestId('device-card-dexcom-g7');
     await user.click(dexcomG7Card);
@@ -41,14 +57,26 @@ describe('DeviceSelection', () => {
   });
 
   it('should show the selected device as selected', () => {
-    render(<DeviceSelection value="dexcom-g7" onChange={mockOnChange} onNext={mockOnNext} />);
+    render(
+      <DeviceSelection 
+        value="dexcom-g7" 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
     const dexcomG7Card = screen.getByTestId('device-card-dexcom-g7');
     expect(dexcomG7Card).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('should show unselected devices as not selected', () => {
-    render(<DeviceSelection value="dexcom-g7" onChange={mockOnChange} onNext={mockOnNext} />);
+    render(
+      <DeviceSelection 
+        value="dexcom-g7" 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
     const dexcomG6Card = screen.getByTestId('device-card-dexcom-g6');
     expect(dexcomG6Card).toHaveAttribute('aria-pressed', 'false');
@@ -56,7 +84,13 @@ describe('DeviceSelection', () => {
 
   it('should allow switching between devices', async () => {
     const user = userEvent.setup();
-    render(<DeviceSelection value="dexcom-g7" onChange={mockOnChange} onNext={mockOnNext} />);
+    render(
+      <DeviceSelection 
+        value="dexcom-g7" 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
     // Click on a different device
     const libreCard = screen.getByTestId('device-card-libre-freestyle-3');
@@ -65,21 +99,20 @@ describe('DeviceSelection', () => {
     expect(mockOnChange).toHaveBeenCalledWith('libre-freestyle-3');
   });
 
-  it('should render device placeholder emojis', () => {
-    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+  it('should allow selecting no-preference', async () => {
+    const user = userEvent.setup();
+    render(
+      <DeviceSelection 
+        value={null} 
+        onChange={mockOnChange} 
+        onNext={mockOnNext}
+      />
+    );
     
-    DEVICES.forEach((device) => {
-      expect(screen.getByText(device.imagePlaceholder)).toBeInTheDocument();
-    });
-  });
-
-  it('should show no device as selected when value is null', () => {
-    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+    const noPreferenceCard = screen.getByTestId('device-card-no-preference');
+    await user.click(noPreferenceCard);
     
-    DEVICES.forEach((device) => {
-      const card = screen.getByTestId(`device-card-${device.id}`);
-      expect(card).toHaveAttribute('aria-pressed', 'false');
-    });
+    expect(mockOnChange).toHaveBeenCalledWith('no-preference');
   });
 
   it('should hide current device from the list when currentDevice is provided', () => {
@@ -99,32 +132,35 @@ describe('DeviceSelection', () => {
     expect(screen.getByTestId('device-card-dexcom-g6')).toBeInTheDocument();
     expect(screen.getByTestId('device-card-libre-freestyle-3')).toBeInTheDocument();
     expect(screen.getByTestId('device-card-libre-14-day')).toBeInTheDocument();
+    
+    // Should show no-preference, not other
+    expect(screen.getByTestId('device-card-no-preference')).toBeInTheDocument();
+    expect(screen.queryByTestId('device-card-other')).not.toBeInTheDocument();
   });
 
-  it('should show all devices when currentDevice is null', () => {
+  it('should show 5 devices (4 CGM devices + no-preference)', () => {
     render(
       <DeviceSelection 
         value={null} 
         onChange={mockOnChange} 
-        onNext={mockOnNext} 
-        currentDevice={null}
+        onNext={mockOnNext}
       />
     );
     
-    DEVICES.forEach((device) => {
-      expect(screen.getByTestId(`device-card-${device.id}`)).toBeInTheDocument();
-    });
-  });
-
-  it('should show all devices when currentDevice is not provided', () => {
-    render(<DeviceSelection value={null} onChange={mockOnChange} onNext={mockOnNext} />);
+    // Should have 5 devices (4 CGM devices + no-preference, excluding "other")
+    const deviceCards = screen.getAllByRole('button');
+    expect(deviceCards).toHaveLength(5);
     
-    DEVICES.forEach((device) => {
-      expect(screen.getByTestId(`device-card-${device.id}`)).toBeInTheDocument();
-    });
+    // Check specific devices
+    expect(screen.getByTestId('device-card-dexcom-g7')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-dexcom-g6')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-libre-freestyle-3')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-libre-14-day')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-no-preference')).toBeInTheDocument();
+    expect(screen.queryByTestId('device-card-other')).not.toBeInTheDocument();
   });
 
-  it('should filter out current device but still show 4 remaining devices', () => {
+  it('should filter out current device and show no-preference', () => {
     render(
       <DeviceSelection 
         value={null} 
@@ -134,13 +170,15 @@ describe('DeviceSelection', () => {
       />
     );
     
-    // Should have 4 devices (5 total - 1 current)
-    const deviceCards = screen.getAllByRole('button', { pressed: false });
+    // Should have 4 devices (5 total - 1 current, with "no-preference" shown)
+    const deviceCards = screen.getAllByRole('button');
     expect(deviceCards).toHaveLength(4);
     
     // Specific checks
     expect(screen.queryByTestId('device-card-libre-freestyle-3')).not.toBeInTheDocument();
     expect(screen.getByTestId('device-card-dexcom-g7')).toBeInTheDocument();
+    expect(screen.getByTestId('device-card-no-preference')).toBeInTheDocument();
+    expect(screen.queryByTestId('device-card-other')).not.toBeInTheDocument();
   });
 });
 
