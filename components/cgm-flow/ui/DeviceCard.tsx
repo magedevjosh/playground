@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Device } from '@/types/cgm-flow';
 
 interface DeviceCardProps {
@@ -7,6 +8,8 @@ interface DeviceCardProps {
 }
 
 export default function DeviceCard({ device, selected, onSelect }: DeviceCardProps) {
+  const isImagePath = device.image.startsWith('/');
+
   return (
     <button
       onClick={() => onSelect(device.id)}
@@ -20,8 +23,18 @@ export default function DeviceCard({ device, selected, onSelect }: DeviceCardPro
       aria-label={`Select ${device.name}`}
       data-testid={`device-card-${device.id}`}
     >
-      <div className="flex-shrink-0 text-4xl mt-1">
-        {device.imagePlaceholder}
+      <div className="flex-shrink-0 mt-1">
+        {isImagePath ? (
+          <Image
+            src={device.image}
+            alt={device.name}
+            width={64}
+            height={64}
+            className="object-contain"
+          />
+        ) : (
+          <span className="text-4xl">{device.image}</span>
+        )}
       </div>
       <div className="flex-1">
         <h3 className={`text-lg font-semibold mb-1 ${selected ? '' : 'text-gray-900'}`}

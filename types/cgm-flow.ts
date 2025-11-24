@@ -30,7 +30,7 @@ export interface Device {
   id: string;
   name: string;
   description: string;
-  imagePlaceholder: string;
+  image: string;
 }
 
 export interface StepProps {
@@ -44,37 +44,37 @@ export const DEVICES: Device[] = [
     id: 'dexcom-g7',
     name: 'Dexcom G7',
     description: 'The most advanced CGM system with a sleek, all-in-one design and real-time glucose readings.',
-    imagePlaceholder: '📱',
+    image: '📱', // TODO: Replace with '/images/cgm-flow/devices/dexcom-g7.webp' once generated
   },
   {
     id: 'dexcom-g6',
     name: 'Dexcom G6',
     description: 'Proven CGM technology with no fingersticks required and seamless smartphone integration.',
-    imagePlaceholder: '📲',
+    image: '📲', // TODO: Replace with '/images/cgm-flow/devices/dexcom-g6.webp' once generated
   },
   {
     id: 'libre-freestyle-3',
     name: 'Libre FreeStyle 3',
     description: 'Small, discreet sensor with continuous glucose monitoring and smartphone alerts.',
-    imagePlaceholder: '⌚',
+    image: '⌚', // TODO: Replace with '/images/cgm-flow/devices/libre-freestyle-3.webp' once generated
   },
   {
     id: 'libre-14-day',
     name: 'Libre 14 Day',
     description: 'Affordable CGM option with 14-day wear time and easy scanning technology.',
-    imagePlaceholder: '🔍',
+    image: '🔍', // TODO: Replace with '/images/cgm-flow/devices/libre-14-day.webp' once generated
   },
   {
     id: 'other',
     name: 'I don\'t see my device',
     description: 'Select this option if your device is not listed above.',
-    imagePlaceholder: '❓',
+    image: '❓',
   },
   {
     id: 'no-preference',
     name: 'No Preference',
     description: 'I would like assistance in choosing the right device for me.',
-    imagePlaceholder: '💡',
+    image: '💡',
   },
 ];
 

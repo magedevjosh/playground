@@ -9,7 +9,7 @@ describe('DeviceCard', () => {
     id: 'dexcom-g7',
     name: 'Dexcom G7',
     description: 'The most advanced CGM system with a sleek, all-in-one design.',
-    imagePlaceholder: '📱',
+    image: '/images/cgm-flow/devices/dexcom-g7.webp',
   };
 
   const mockOnSelect = vi.fn();
@@ -28,9 +28,11 @@ describe('DeviceCard', () => {
     expect(screen.getByText(/The most advanced CGM system/)).toBeInTheDocument();
   });
 
-  it('should render device placeholder emoji', () => {
+  it('should render device image', () => {
     render(<DeviceCard device={mockDevice} selected={false} onSelect={mockOnSelect} />);
-    expect(screen.getByText('📱')).toBeInTheDocument();
+    const image = screen.getByAltText('Dexcom G7');
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveAttribute('src', expect.stringContaining('dexcom-g7.webp'));
   });
 
   it('should have correct test-id', () => {
@@ -106,14 +108,15 @@ describe('DeviceCard', () => {
       id: 'libre-freestyle-3',
       name: 'Libre FreeStyle 3',
       description: 'Small, discreet sensor with continuous glucose monitoring.',
-      imagePlaceholder: '⌚',
+      image: '/images/cgm-flow/devices/libre-freestyle-3.webp',
     };
 
     render(<DeviceCard device={anotherDevice} selected={false} onSelect={mockOnSelect} />);
-    
+
     expect(screen.getByText('Libre FreeStyle 3')).toBeInTheDocument();
     expect(screen.getByText(/Small, discreet sensor/)).toBeInTheDocument();
-    expect(screen.getByText('⌚')).toBeInTheDocument();
+    const image = screen.getByAltText('Libre FreeStyle 3');
+    expect(image).toHaveAttribute('src', expect.stringContaining('libre-freestyle-3.webp'));
     expect(screen.getByTestId('device-card-libre-freestyle-3')).toBeInTheDocument();
   });
 
@@ -130,9 +133,23 @@ describe('DeviceCard', () => {
 
   it('should have text-left alignment for content', () => {
     render(<DeviceCard device={mockDevice} selected={false} onSelect={mockOnSelect} />);
-    
+
     const card = screen.getByTestId('device-card-dexcom-g7');
     expect(card).toHaveClass('text-left');
+  });
+
+  it('should render emoji for devices without image paths', () => {
+    const emojiDevice: Device = {
+      id: 'other',
+      name: 'I don\'t see my device',
+      description: 'Select this option if your device is not listed above.',
+      image: '❓',
+    };
+
+    render(<DeviceCard device={emojiDevice} selected={false} onSelect={mockOnSelect} />);
+
+    expect(screen.getByText('❓')).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });
 
