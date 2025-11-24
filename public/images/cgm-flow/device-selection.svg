@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" fill="none">
+  <rect width="600" height="400" fill="#f5f0f6"/>
+  <rect x="120" y="80" width="160" height="240" rx="12" fill="white" stroke="#9d7ea7" stroke-width="3"/>
+  <rect x="130" y="90" width="140" height="120" rx="8" fill="#e8dce9"/>
+  <text x="200" y="180" font-family="Arial" font-size="48" text-anchor="middle">📱</text>
+  <text x="200" y="250" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Device A</text>
+  <rect x="320" y="80" width="160" height="240" rx="12" fill="white" stroke="#9d7ea7" stroke-width="4"/>
+  <rect x="330" y="90" width="140" height="120" rx="8" fill="#d2bed8"/>
+  <text x="400" y="180" font-family="Arial" font-size="48" text-anchor="middle">📲</text>
+  <text x="400" y="250" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Device B</text>
+  <circle cx="460" cy="100" r="20" fill="#9d7ea7"/>
+  <path d="M450 100 L458 108 L472 94" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M220 340 L240 360 L200 380" fill="#9d7ea7" stroke="#9d7ea7" stroke-width="2" stroke-linejoin="round"/>
+  <line x1="240" y1="360" x2="400" y2="320" stroke="#9d7ea7" stroke-width="3" stroke-dasharray="5,5"/>
+</svg>

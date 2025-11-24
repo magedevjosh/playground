@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { StepId, FlowState, FlowAnswers } from '@/types/cgm-flow';
 import {
   getNextStep,
@@ -9,6 +10,7 @@ import {
   getStepQuestion,
   getValidationError,
 } from '@/utils/navigation-logic';
+import { STEP_IMAGES } from '@/constants/step-images';
 import Header from './ui/Header';
 import NavigationButtons from './ui/NavigationButtons';
 import CurrentlyUsingCGM from './steps/CurrentlyUsingCGM';
@@ -303,6 +305,20 @@ export default function FlowContainer() {
             <p className="text-lg text-gray-700">
               {getStepQuestion(flowState.currentStep)}
             </p>
+          </div>
+
+          {/* Step image */}
+          <div className="mb-6 flex justify-center">
+            <div className="w-full max-w-md">
+              <Image
+                src={STEP_IMAGES[flowState.currentStep].src}
+                alt={STEP_IMAGES[flowState.currentStep].alt}
+                width={600}
+                height={400}
+                className="w-full h-auto"
+                priority
+              />
+            </div>
           </div>
 
           {/* Step content */}
