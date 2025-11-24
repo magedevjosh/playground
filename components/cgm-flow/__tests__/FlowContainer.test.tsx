@@ -349,7 +349,7 @@ describe('FlowContainer', () => {
       await waitFor(() => {
         expect(screen.getByText('Last Device Update')).toBeInTheDocument();
       });
-      await user.click(screen.getByTestId('radio-option-0-1-year'));
+      await user.click(screen.getByTestId('radio-option-5-plus-years'));
       await user.click(screen.getByTestId('next-button'));
 
       // Step 4: Last Sensors Ordered
@@ -413,6 +413,45 @@ describe('FlowContainer', () => {
       await waitFor(() => {
         expect(screen.getByText('Summary')).toBeInTheDocument();
       });
+    });
+
+    it('should skip Device Switch Intention step when device update is less than 5 years', async () => {
+      const user = userEvent.setup();
+      render(<FlowContainer />);
+
+      // Step 1: Currently using CGM - Yes
+      await user.click(screen.getByLabelText('Yes'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 2: Current Device
+      await waitFor(() => {
+        expect(screen.getByText('Current Device')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('device-card-dexcom-g7'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 3: Last Device Update - Select 1-3 years (not eligible for upgrade)
+      await waitFor(() => {
+        expect(screen.getByText('Last Device Update')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('radio-option-1-3-years'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 4: Last Sensors Ordered
+      await waitFor(() => {
+        expect(screen.getByText('Last Sensors Ordered')).toBeInTheDocument();
+      });
+      await user.click(screen.getByTestId('radio-option-0-1-months'));
+      await user.click(screen.getByTestId('next-button'));
+
+      // Step 5: Should skip Device Switch Intention and go directly to Last Doctor Visit
+      await waitFor(() => {
+        expect(screen.getByText('Last Doctor Visit')).toBeInTheDocument();
+      });
+
+      // Verify Device Switch Intention was never shown
+      expect(screen.queryByText('Device Switch Intention')).not.toBeInTheDocument();
+      expect(screen.queryByText('Are you interested in switching to a different CGM device?')).not.toBeInTheDocument();
     });
 
     it('should handle ineligible user flow - device "other" with recent update', async () => {
@@ -541,7 +580,7 @@ describe('FlowContainer', () => {
         answers: {
           currentlyUsingCGM: true,
           currentDevice: 'dexcom-g7',
-          lastDeviceUpdate: '0-1-year',
+          lastDeviceUpdate: '5-plus-years',
           lastSensorsOrdered: '0-1-months',
           deviceSwitchIntention: true,
           deviceSelection: 'libre-freestyle-3',
@@ -959,6 +998,82 @@ describe('FlowContainer', () => {
 
       // Should show the updated answer
       expect(screen.getByText('5+ Years')).toBeInTheDocument();
+    });
+
+    it('should prevent returning to summary when current device matches device selection', async () => {
+      const user = userEvent.setup();
+      
+      // Set up state where user is on summary with current device and device selection different
+      const summaryState = {
+        currentStep: 'summary',
+        answers: {
+          currentlyUsingCGM: true,
+          currentDevice: 'dexcom-g6',
+          lastDeviceUpdate: '1-3-years',
+          lastSensorsOrdered: '1-3-months',
+          deviceSwitchIntention: true,
+          deviceSelection: 'dexcom-g7',
+          lastDoctorVisit: true,
+        },
+        stepHistory: [
+          'currently-using-cgm',
+          'current-device',
+          'last-device-update',
+          'last-sensors-ordered',
+          'device-switch-intention',
+          'device-selection',
+          'last-doctor-visit',
+          'summary'
+        ],
+        returnToSummary: false,
+      };
+      localStorage.setItem('cgm-flow-state', JSON.stringify(summaryState));
+
+      render(<FlowContainer />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Summary')).toBeInTheDocument();
+      });
+
+      // Edit Current Device
+      await user.click(screen.getByTestId('edit-current-device'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Current Device')).toBeInTheDocument();
+      });
+
+      // Change to match device selection (Dexcom G7)
+      await user.click(screen.getByTestId('device-card-dexcom-g7'));
+
+      // Try to return to summary (should show error)
+      await user.click(screen.getByTestId('return-to-summary-button'));
+
+      await waitFor(() => {
+        const errorMessage = screen.getByTestId('validation-error');
+        expect(errorMessage).toBeInTheDocument();
+        expect(errorMessage).toHaveTextContent('Dexcom G7');
+        expect(errorMessage).toHaveTextContent('cannot select');
+        expect(errorMessage).toHaveTextContent('already selected it as your new device');
+      });
+
+      // User should still be on Current Device step
+      expect(screen.getByText('Current Device')).toBeInTheDocument();
+      expect(screen.getByText('Which CGM device are you currently using?')).toBeInTheDocument();
+
+      // Change to a different device (Dexcom G6)
+      await user.click(screen.getByTestId('device-card-dexcom-g6'));
+
+      // Now return to summary should work
+      await user.click(screen.getByTestId('return-to-summary-button'));
+
+      // Should return to Summary successfully
+      await waitFor(() => {
+        expect(screen.getByText('Summary')).toBeInTheDocument();
+        expect(screen.getByText('Your CGM Experience Profile')).toBeInTheDocument();
+      });
+
+      // Validation error should be cleared
+      expect(screen.queryByTestId('validation-error')).not.toBeInTheDocument();
     });
   });
 });

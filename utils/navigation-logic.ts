@@ -1,4 +1,4 @@
-import { StepId, FlowAnswers } from '@/types/cgm-flow';
+import { StepId, FlowAnswers, DEVICES } from '@/types/cgm-flow';
 
 export function getNextStep(currentStep: StepId, answers: FlowAnswers): StepId | null {
   switch (currentStep) {
@@ -18,7 +18,11 @@ export function getNextStep(currentStep: StepId, answers: FlowAnswers): StepId |
       return 'last-sensors-ordered';
 
     case 'last-sensors-ordered':
-      return 'device-switch-intention';
+      // Only show device switch intention if they've had their device for 5+ years
+      // Otherwise, they're not eligible for an upgrade and we skip to last doctor visit
+      return answers.lastDeviceUpdate === '5-plus-years' 
+        ? 'device-switch-intention' 
+        : 'last-doctor-visit';
 
     case 'device-switch-intention':
       // If wants to switch, go to Device Selection
@@ -146,9 +150,16 @@ export function getValidationError(currentStep: StepId, answers: FlowAnswers): s
         : null;
 
     case 'current-device':
-      return answers.currentDevice === null
-        ? 'Please select your current CGM device.'
-        : null;
+      if (answers.currentDevice === null) {
+        return 'Please select your current CGM device.';
+      }
+      // Check if the current device matches the device they selected on Device Selection step
+      if (answers.deviceSelection !== null && answers.currentDevice === answers.deviceSelection) {
+        const device = DEVICES.find(d => d.id === answers.currentDevice);
+        const deviceName = device ? device.name : 'this device';
+        return `You cannot select ${deviceName} as your current device because you've already selected it as your new device.`;
+      }
+      return null;
 
     case 'last-device-update':
       return answers.lastDeviceUpdate === null

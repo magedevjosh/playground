@@ -86,8 +86,36 @@ describe('navigation-logic', () => {
       expect(getNextStep('last-device-update', answers)).toBe('last-sensors-ordered');
     });
 
-    it('should navigate from last-sensors-ordered to device-switch-intention', () => {
-      expect(getNextStep('last-sensors-ordered', emptyAnswers)).toBe('device-switch-intention');
+    it('should navigate from last-sensors-ordered to device-switch-intention when device update is 5+ years', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        lastDeviceUpdate: '5-plus-years',
+      };
+      expect(getNextStep('last-sensors-ordered', answers)).toBe('device-switch-intention');
+    });
+
+    it('should skip device-switch-intention and go to last-doctor-visit when device update is 0-1 year', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        lastDeviceUpdate: '0-1-year',
+      };
+      expect(getNextStep('last-sensors-ordered', answers)).toBe('last-doctor-visit');
+    });
+
+    it('should skip device-switch-intention and go to last-doctor-visit when device update is 1-3 years', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        lastDeviceUpdate: '1-3-years',
+      };
+      expect(getNextStep('last-sensors-ordered', answers)).toBe('last-doctor-visit');
+    });
+
+    it('should skip device-switch-intention and go to last-doctor-visit when device update is 3-4 years', () => {
+      const answers: FlowAnswers = {
+        ...emptyAnswers,
+        lastDeviceUpdate: '3-4-years',
+      };
+      expect(getNextStep('last-sensors-ordered', answers)).toBe('last-doctor-visit');
     });
 
     it('should navigate from device-switch-intention to device-selection when answer is true', () => {
@@ -381,6 +409,37 @@ describe('navigation-logic', () => {
 
     it('should return null for current-device when answer is provided', () => {
       const answers = { ...emptyAnswers, currentDevice: 'dexcom-g7' };
+      expect(getValidationError('current-device', answers)).toBeNull();
+    });
+
+    it('should return error for current-device when it matches device-selection', () => {
+      const answers = { 
+        ...emptyAnswers, 
+        currentDevice: 'dexcom-g7',
+        deviceSelection: 'dexcom-g7'
+      };
+      const error = getValidationError('current-device', answers);
+      expect(error).toBeTruthy();
+      expect(error).toContain('Dexcom G7');
+      expect(error).toContain('cannot select');
+      expect(error).toContain('already selected it as your new device');
+    });
+
+    it('should return null for current-device when devices are different', () => {
+      const answers = { 
+        ...emptyAnswers, 
+        currentDevice: 'dexcom-g6',
+        deviceSelection: 'dexcom-g7'
+      };
+      expect(getValidationError('current-device', answers)).toBeNull();
+    });
+
+    it('should return null for current-device when deviceSelection is null', () => {
+      const answers = { 
+        ...emptyAnswers, 
+        currentDevice: 'dexcom-g7',
+        deviceSelection: null
+      };
       expect(getValidationError('current-device', answers)).toBeNull();
     });
 

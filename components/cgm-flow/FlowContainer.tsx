@@ -155,6 +155,13 @@ export default function FlowContainer() {
   };
 
   const handleReturnToSummary = () => {
+    // Validate current step before returning to summary
+    const error = getValidationError(flowState.currentStep, flowState.answers);
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+    
     // Check if current answers would make user ineligible
     const isIneligible = 
       flowState.answers.currentDevice === 'other' && 

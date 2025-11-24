@@ -754,6 +754,91 @@ For each device (Dexcom G7, Dexcom G6, Libre FreeStyle 3, Libre 14 Day, I don't 
 
 ---
 
+#### TC-012a: Device Selection - Cannot Select Same Device as Current When Going Back
+**Priority:** High  
+**Objective:** Verify validation prevents selecting the same device on Current Device that was already selected on Device Selection
+
+**Preconditions:**
+- Application is loaded
+
+**Steps:**
+1. Navigate to the application URL
+2. Select "Yes" for "Currently Using CGM"
+3. On "Current Device", select "Dexcom G6"
+4. Progress through device update and sensor questions
+5. Select "Yes" for "Device Switch Intention"
+6. On "Device Selection", select "Dexcom G7"
+7. Continue to next steps, then click "Back" multiple times to return to "Current Device"
+8. Change selection to "Dexcom G7" (same as Device Selection)
+9. Click "Next" button
+10. Verify validation error message appears
+11. Verify error message includes "Dexcom G7" device name
+12. Verify error message states "You cannot select Dexcom G7 as your current device because you've already selected it as your new device."
+13. Verify you remain on "Current Device" step
+14. Change selection to a different device (e.g., "Dexcom G6")
+15. Click "Next" button
+16. Verify you can proceed normally
+
+**Expected Results:**
+- Validation error appears when current device matches device selection
+- Error message clearly identifies the device name
+- User cannot proceed with matching devices
+- User remains on Current Device step when validation fails
+- Flow continues normally after changing to a different device
+- Validation only applies when going back after Device Selection was already answered
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
+#### TC-012b: Device Selection - Cannot Return to Summary with Same Device Selection
+**Priority:** High  
+**Objective:** Verify validation prevents returning to summary when current device matches device selection during edit mode
+
+**Preconditions:**
+- Application is loaded
+- User has completed the full flow and is on Summary page
+
+**Steps:**
+1. Complete the existing user switching devices flow (8 steps total):
+   - Currently Using CGM: Yes
+   - Current Device: Dexcom G6
+   - Last Device Update: 1-3 Years
+   - Last Sensors Ordered: 1-3 months
+   - Device Switch Intention: Yes
+   - Device Selection: Dexcom G7
+   - Last Doctor Visit: Yes
+2. Verify you're on Summary page
+3. Click on "Current Device" heading to edit
+4. Verify you navigate to "Current Device" step
+5. Verify "Return to Summary" button is visible
+6. Change selection to "Dexcom G7" (same as Device Selection)
+7. Click "Return to Summary" button
+8. Verify validation error message appears
+9. Verify error message includes "Dexcom G7" device name
+10. Verify error message states "You cannot select Dexcom G7 as your current device because you've already selected it as your new device."
+11. Verify you remain on "Current Device" step
+12. Change selection back to "Dexcom G6" (different device)
+13. Click "Return to Summary" button
+14. Verify you return to Summary page successfully
+15. Verify "Current Device" still shows "Dexcom G6"
+16. Verify no validation error is displayed
+
+**Expected Results:**
+- Validation error appears when trying to return to summary with matching devices
+- Error message clearly identifies the device name
+- User cannot return to summary with matching devices
+- User remains on Current Device step when validation fails
+- Return to Summary works normally after changing to a different device
+- Changes are preserved when successfully returning to summary
+- Validation applies to both "Next" and "Return to Summary" buttons
+
+**Actual Results:** [To be filled]  
+**Pass/Fail:** [To be marked]
+
+---
+
 ### Time Range Validation Scenarios
 
 #### TC-013: All Time Range Selections - Device Update
