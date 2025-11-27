@@ -11,6 +11,7 @@ import {
   getValidationError,
 } from '@/utils/navigation-logic';
 import { STEP_IMAGES } from '@/constants/step-images';
+import { useEligibleDevices } from '@/hooks/useEligibleDevices';
 import Header from './ui/Header';
 import NavigationButtons from './ui/NavigationButtons';
 import CurrentlyUsingCGM from './steps/CurrentlyUsingCGM';
@@ -43,6 +44,9 @@ export default function FlowContainer() {
     returnToSummary: false,
   });
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Fetch eligible devices from API
+  const { devices, isLoading, error: apiError, refetch } = useEligibleDevices();
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -249,6 +253,7 @@ export default function FlowContainer() {
             value={flowState.answers.deviceSelection}
             onChange={(value) => updateAnswer('deviceSelection', value)}
             currentDevice={flowState.answers.currentDevice}
+            devices={devices}
           />
         );
 
@@ -282,10 +287,73 @@ export default function FlowContainer() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-3xl w-full mx-auto px-6 py-8">
         <Header onLogoClick={handleLogoClick} />
-        
+
         <main className="bg-white shadow-lg p-8">
-          {/* Progress indicator */}
-          <div className="mb-8">
+          {/* API Loading State */}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-12" data-testid="loading-state">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+              <p className="text-gray-600">Loading eligible devices...</p>
+            </div>
+          )}
+
+          {/* API Error State */}
+          {!isLoading && apiError && (
+            <div className="py-12" data-testid="error-state">
+              <div
+                className="mb-6 p-6 text-center"
+                style={{
+                  backgroundColor: '#fef2f2',
+                  border: '1px solid #fca5a5',
+                  color: '#991b1b',
+                }}
+                role="alert"
+              >
+                <h2 className="text-xl font-semibold mb-2">Unable to Load Devices</h2>
+                <p className="mb-4">{apiError}</p>
+                <button
+                  onClick={refetch}
+                  className="px-6 py-3 font-medium transition-all cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--primary)',
+                    color: 'white',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--primary)';
+                  }}
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Empty State - No Eligible Devices */}
+          {!isLoading && !apiError && devices.length === 0 && (
+            <div className="py-12 text-center" data-testid="empty-state">
+              <div className="mb-6">
+                <div className="text-6xl mb-4">📋</div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  No Eligible Devices Available
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  We couldn&apos;t find any devices that you&apos;re eligible for at this time.
+                </p>
+                <p className="text-gray-500 text-sm">
+                  Please contact support for more information.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Main Flow Content - Only show when data is loaded and available */}
+          {!isLoading && !apiError && devices.length > 0 && (
+            <>
+              {/* Progress indicator */}
+              <div className="mb-8">
             <div className="flex justify-between items-center text-sm mb-2">
               <div className="text-gray-500">
                 Step {flowState.stepHistory.length}
@@ -363,6 +431,8 @@ export default function FlowContainer() {
               returnToSummary={flowState.returnToSummary}
               onReturnToSummary={handleReturnToSummary}
             />
+          )}
+            </>
           )}
         </main>
       </div>

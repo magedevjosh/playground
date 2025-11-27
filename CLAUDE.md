@@ -74,6 +74,80 @@ This is the main feature of the application - a multi-step flow for managing CGM
 - `DEVICES`: Array of available CGM devices
 - `TIME_RANGES`: Time range options for device updates and sensor orders
 
+### API Integration
+
+The application integrates with external APIs to fetch patient data and eligible devices. This architecture keeps API keys secure by using Next.js API Routes as a server-side proxy.
+
+**Environment Variables** (`.env.local`):
+- `PATIENT_API_BASE_URL`: Base URL for the external patient API
+- `PATIENT_API_KEY`: API key for authentication
+- `NEXT_PUBLIC_ENABLE_API_INTEGRATION`: Feature flag to enable/disable API integration
+
+**API Layer Architecture**:
+
+1. **HTTP Client** (`lib/api/client.ts`):
+   - Centralized fetch wrapper with error handling
+   - Automatic authentication headers (Bearer token)
+   - Timeout configuration (30s default)
+   - Type-safe request/response handling
+   - Methods: `get`, `post`, `put`, `delete`, `patch`
+
+2. **Error Handling** (`lib/api/errors.ts`):
+   - Custom error classes: `APIError`, `NetworkError`, `ValidationError`, `AuthError`, `NotFoundError`, `ServerError`
+   - Helper functions: `isAPIError()`, `getErrorMessage()`
+
+3. **API Types** (`types/api.ts`):
+   - `PatientDeviceResponse`: External API response structure
+   - `DeviceData`: Raw device data from API
+   - `CustomerPricingResponse`: Pricing information structure
+   - `mapDeviceDataToDevice()`: Transforms API data to internal `Device` format
+   - `filterEligibleDevices()`: Filters devices based on eligibility
+
+4. **Service Layer** (`services/patient-service.ts`):
+   - `fetchEligibleDevices(patientId)`: Fetches and transforms eligible devices
+   - `fetchCustomerPricing(customerId)`: Fetches pricing information
+   - `validatePatientDeviceEligibility(patientId, deviceId)`: Validates eligibility
+   - Handles API calls, validation, and data transformation
+
+5. **Next.js API Routes** (`app/api/`):
+   - `GET /api/patients/devices`: Returns eligible devices for a patient
+     - Query params: `patientId` (optional, defaults to `TEST_PATIENT_ID`)
+     - Response: `{ success: boolean, data: Device[], patientId: string, count: number }`
+   - Server-side proxy keeps API keys secure (never exposed to client)
+
+6. **Custom Hooks** (`hooks/useEligibleDevices.ts`):
+   - React hook for fetching devices from `/api/patients/devices`
+   - Returns: `{ devices, isLoading, error, refetch }`
+   - Options: `patientId` (optional), `enabled` (default: true)
+   - Automatically fetches on mount and when `patientId` changes
+
+**Data Flow**:
+```
+External API → Service Layer → Next.js API Route → Custom Hook → Component
+```
+
+**UI States**:
+- **Loading State**: Spinner with "Loading eligible devices..." message
+- **Error State**: Error message with "Try Again" button to refetch
+- **Empty State**: "No Eligible Devices Available" message with support contact info
+- **Success State**: Displays flow with fetched devices
+
+**Configuration** (`lib/constants.ts`):
+- `API_CONFIG`: Base URL, API key, timeout settings
+- `API_ENDPOINTS`: Endpoint paths (`PATIENT_DEVICES`, `CUSTOMER_PRICING`)
+- `TEST_PATIENT_ID`: Demo patient ID for development (`'demo-patient-12345'`)
+- `FEATURES`: Feature flags for API integration
+
+**Fallback Behavior**:
+- `DeviceSelection` component accepts optional `devices` prop
+- Falls back to static `DEVICES` array if not provided
+- Ensures backward compatibility
+
+**Testing**:
+- API route tests: `app/api/patients/devices/__tests__/route.test.ts`
+- Hook tests: `hooks/__tests__/useEligibleDevices.test.ts`
+- Tests cover success, error, empty state, and retry scenarios
+
 ### Styling
 - Tailwind CSS v4 with PostCSS
 - Global styles: `app/globals.css`

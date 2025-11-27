@@ -1,20 +1,26 @@
-import { StepProps, DEVICES } from '@/types/cgm-flow';
+import { StepProps, DEVICES, Device } from '@/types/cgm-flow';
 import DeviceCard from '../ui/DeviceCard';
 
 interface DeviceSelectionProps extends StepProps {
   currentDevice?: string | null;
   currentlyUsingCGM?: boolean | null;
+  devices?: Device[]; // Optional devices from API, falls back to static DEVICES
 }
 
-export default function DeviceSelection({ value, onChange, currentDevice }: DeviceSelectionProps) {
+export default function DeviceSelection({
+  value,
+  onChange,
+  currentDevice,
+  devices = DEVICES // Default to static DEVICES if not provided
+}: DeviceSelectionProps) {
   // Filter devices: always show "no-preference", never show "other"
-  const availableDevices = DEVICES.filter(device => {
+  const availableDevices = devices.filter(device => {
     // Always filter out the current device
     if (device.id === currentDevice) return false;
-    
+
     // Never show "I don't see my device" on Device Selection
     if (device.id === 'other') return false;
-    
+
     return true;
   });
   
